@@ -4,15 +4,15 @@ Proyecto de Algoritmica I
 Integrantes:
 
 
-Castilla Huanca Marco Renato
-
-Taco Zavala Miguel Angel 
+Aldana Chavez David
 
 Basualdo Ale Marcos Luis
 
 Bohorquez Huaringa Kevin Rhamses
 
-Aldana Chavez David
+Castilla Huanca Marco Renato
+
+Taco Zavala Miguel Angel 
 
 
 Grupo 12 
@@ -26,3 +26,5 @@ pip install tkinter
 pip install customtkinter
 
 pip install pandas
+
+Ejecutar el nuevoPruebas.py
