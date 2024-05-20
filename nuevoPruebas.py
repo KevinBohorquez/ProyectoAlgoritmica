@@ -6,36 +6,21 @@ from PIL import Image, ImageTk
 import pandas as pd
 from customtkinter import *
 
-
-def leer_linea(nombre_archivo, numero_linea):
-
-    try:
-        with open(nombre_archivo, 'r') as archivo:
-            lineas = archivo.readlines()
-        if 0 <= numero_linea < len(lineas):
-            return lineas[numero_linea]
-        else:
-            print("Número de línea fuera de rango:", numero_linea)
-    except FileNotFoundError:
-        print("El archivo '{}' no fue encontrado.".format(nombre_archivo))
-        return None
-
-
 class Login(tk.Frame):
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
 
-        fondoUNMSM = ImageTk.PhotoImage(file="C:/Users/Kevin/Desktop/Proyecto Algoritmica/bgr.png")
-        rutaIcono = "C:/Users/Kevin/Desktop/Proyecto Algoritmica/logofisi.png"
-        img1 = Image.open(rutaIcono)
+        fondounmsm = ImageTk.PhotoImage(file="C:/Users/Kevin/Desktop/Proyecto Algoritmica/bgr.png")
+        rutaicono = "C:/Users/Kevin/Desktop/Proyecto Algoritmica/logofisi.png"
+        img1 = Image.open(rutaicono)
         img1 = img1.resize((155, 155))
 
         borde = tk.LabelFrame(self, bg='white', bd=10, font=("Microsoft YaHei UI Light", 15))
         borde.pack(fill="both", expand=True)
 
-        fondazo = tk.Label(borde, image=fondoUNMSM)
-        fondazo.image = fondoUNMSM
+        fondazo = tk.Label(borde, image=fondounmsm)
+        fondazo.image = fondounmsm
         fondazo.place(x=0, y=0, relwidth=1, relheight=1)
 
         label_bg = tk.Label(borde, bg="black")
@@ -63,22 +48,17 @@ class Login(tk.Frame):
         def entrar():
 
             try:
-                df = pd.read_excel('loginData.xlsx')
+                df = pd.read_excel('loginDataTEST.xlsx')
                 if (str(T1.get()) in df["Correo"].values):
                     if df[df["Correo"] == str(T1.get())]["Codigo"].iloc[0] == int(T2.get()):
                         messagebox.showinfo("Acceso Correcto", "Has ingresado")
                         numFila = df[df["Codigo"] == int(T2.get())]
-                        Creditos = numFila["Creditos"].iloc[0]
-                        Nombre = numFila["Nombre"].iloc[0]
-                        fisicoins = numFila["Dinero"].iloc[0]
-                        tipoalumno = numFila["Tipo"].iloc[0]
-                        with open('datosUsuario.txt', 'w') as archivo:
-                            archivo.write((T2.get())+"\n")
-                            archivo.write((T1.get())+"\n")
-                            archivo.write(str(int(Creditos))+"\n")
-                            archivo.write(str(Nombre)+"\n")
-                            archivo.write(str(tipoalumno)+"\n")
-                            archivo.write(str(int(fisicoins))+"\n")
+                        controller.creditos = str(numFila["Creditos"].iloc[0])
+                        controller.nombreEstudiante = numFila["Nombre"].iloc[0]
+                        controller.FisiCoins = numFila["Dinero"].iloc[0]
+                        controller.tipoEstudiante = (numFila["Tipo"].iloc[0])
+                        controller.codigoEstudiante = str(int(T2.get()))
+                        controller.correoEstudiante = str(T1.get())
                         T1.delete(0, tk.END)
                         T2.delete(0, tk.END)
                         controller.show_frame(MenuOpciones)
@@ -121,23 +101,23 @@ class MenuOpciones(tk.Frame):
         image_label = customtkinter.CTkLabel(bordeMenu, image=image, text='')
         image_label.place(x=555, y=272)
 
-        Buttoon = CTkButton(bordeMenu, width=550, bg_color="purple3", text_color="black", corner_radius=16, height=150, fg_color="green4", hover_color="green3",text="Operaciones Bancarias", font=("Microsoft YaHei UI Light", 30), command=lambda: controller.show_frame(InfoUsuario))
-        Buttoon.place(x=120, y=110)
+        buttoon = CTkButton(bordeMenu, width=550, bg_color="purple3", text_color="black", corner_radius=16, height=150, fg_color="green4", hover_color="green3",text="Operaciones Bancarias", font=("Microsoft YaHei UI Light", 30), command=lambda: controller.show_frame(InfoUsuario))
+        buttoon.place(x=120, y=110)
 
-        Buttoon1 = CTkButton(bordeMenu, width=550, bg_color="purple3", text_color="black", corner_radius=16, height=150,  fg_color="red4", hover_color="red2", text="Pagar Servicios", font=("Microsoft YaHei UI Light", 30))
-        Buttoon1.place(x=690, y=110)
+        buttoon1 = CTkButton(bordeMenu, width=550, bg_color="purple3", text_color="black", corner_radius=16, height=150,  fg_color="red4", hover_color="red2", text="Pagar Servicios", font=("Microsoft YaHei UI Light", 30))
+        buttoon1.place(x=690, y=110)
 
-        Buttoon2 = CTkButton(bordeMenu, width=420, bg_color="purple3", text_color="black", corner_radius=16, height=150, text="Proximamente:\nQuiosco Virtual", font=("Microsoft YaHei UI Light", 30))
-        Buttoon2.place(x=120, y=270)
+        buttoon2 = CTkButton(bordeMenu, width=420, bg_color="purple3", text_color="black", corner_radius=16, height=150, text="Proximamente:\nQuiosco Virtual", font=("Microsoft YaHei UI Light", 30))
+        buttoon2.place(x=120, y=270)
 
-        Buttoon3 = CTkButton(bordeMenu, width=420, bg_color="purple3", text_color="black", corner_radius=16, height=150, text="Proximamente:\n Casino", font=("Microsoft YaHei UI Light", 30))
-        Buttoon3.place(x=820, y=270)
+        buttoon3 = CTkButton(bordeMenu, width=420, bg_color="purple3", text_color="black", corner_radius=16, height=150, text="Proximamente:\n Casino", font=("Microsoft YaHei UI Light", 30))
+        buttoon3.place(x=820, y=270)
 
-        Buttoon2 = CTkButton(bordeMenu, width=550, bg_color="purple3", text_color="black", corner_radius=16, height=150, fg_color="blue4", hover_color="blue", text="Configuracion", font=("Microsoft YaHei UI Light", 30))
-        Buttoon2.place(x=120, y=430)
+        buttoon4 = CTkButton(bordeMenu, width=550, bg_color="purple3", text_color="black", corner_radius=16, height=150, fg_color="blue4", hover_color="blue", text="Configuracion", font=("Microsoft YaHei UI Light", 30))
+        buttoon4.place(x=120, y=430)
 
-        Buttoon3 = CTkButton(bordeMenu, width=550, bg_color="purple3", text_color="black", corner_radius=16, height=150, fg_color="yellow4", hover_color="yellow3", text="Prestamos e Inversiones", font=("Microsoft YaHei UI Light", 30))
-        Buttoon3.place(x=690, y=430)
+        buttoon5 = CTkButton(bordeMenu, width=550, bg_color="purple3", text_color="black", corner_radius=16, height=150, fg_color="yellow4", hover_color="yellow3", text="Prestamos e Inversiones", font=("Microsoft YaHei UI Light", 30))
+        buttoon5.place(x=690, y=430)
 
         volverLogin = tk.Button(bordeMenu, text="Cerrar Sesion", font=("Microsoft YaHei UI Light", 15), command=lambda: controller.show_frame(Login))
         volverLogin.place(x=10, y=627)
@@ -160,7 +140,7 @@ class InfoUsuario(tk.Frame):
         label_bg3.place(y=40, x=227)
 
 
-        bottonsito2 = CTkButton(bordeInfo, text="Mostrar Informacion", bg_color="gray60", fg_color="gray50", width=392, height=45, corner_radius=8, font=("Microsoft YaHei UI Light", 15), command=lambda: self.mostrarDatos())
+        bottonsito2 = CTkButton(bordeInfo, text="Mostrar Informacion", bg_color="gray60", fg_color="gray50", width=392, height=45, corner_radius=8, font=("Microsoft YaHei UI Light", 15), command= lambda:self.mostrarDatos(controller))
         bottonsito2.place(x=240, y=52)
 
         bottonsito3 = CTkButton(bordeInfo, text="Consultar Saldo", bg_color="gray60", fg_color="gray50", width=392,
@@ -178,26 +158,37 @@ class InfoUsuario(tk.Frame):
         Buttona = tk.Button(self, text="Volver", font=("Arial", 15), command=lambda: self.salirPagina())
         Buttona.place(x=50, y=600)
 
-    def mostrarDatos(self):
-        self.Label = tk.Label(self, fg="white", bg="gray60", text="Codigo de estudiante: "+leer_linea("datosUsuario.txt", 0), font=("Microsoft YaHei UI Light", 12))
+    def mostrarDatos(self, controller):
+        self.controller = controller
+        self.Label = tk.Label(self, fg="white", bg="gray60", text="Codigo de estudiante: "+str(controller.codigoEstudiante), font=("Microsoft YaHei UI Light", 12))
         self.Label.place(x=710, y=100)
-        self.Label2 = tk.Label(self, fg="white", bg="gray60", text="Correo Institucional: "+leer_linea("datosUsuario.txt", 1), font=("Microsoft YaHei UI Light", 12))
+        self.Label2 = tk.Label(self, fg="white", bg="gray60", text="Correo Institucional: "+controller.correoEstudiante, font=("Microsoft YaHei UI Light", 12))
         self.Label2.place(x=710, y=150)
-        self.Label3 = tk.Label(self, fg="white", bg="gray60", text="Creditos: "+leer_linea("datosUsuario.txt", 2), font=("Microsoft YaHei UI Light", 12))
+        self.Label3 = tk.Label(self, fg="white", bg="gray60", text="Creditos: "+str(controller.creditos), font=("Microsoft YaHei UI Light", 12))
         self.Label3.place(x=710, y=200)
-        self.Label4 = tk.Label(self, fg="white", bg="gray60", text="Nombre del Estudiante: "+leer_linea("datosUsuario.txt", 3), font=("Microsoft YaHei UI Light", 11))
+        self.Label4 = tk.Label(self, fg="white", bg="gray60", text="Nombre del Estudiante: "+controller.nombreEstudiante, font=("Microsoft YaHei UI Light", 11))
         self.Label4.place(x=710, y=250)
-        self.Label5 = tk.Label(self, fg="white", bg="gray60", text="Tipo de Estudiante: " + leer_linea("datosUsuario.txt", 4), font=("Microsoft YaHei UI Light", 12))
+        self.Label5 = tk.Label(self, fg="white", bg="gray60", text="Tipo de Estudiante: " + controller.tipoEstudiante, font=("Microsoft YaHei UI Light", 12))
         self.Label5.place(x=710, y=300)
+        self.Label6 = tk.Label(self, fg="white", bg="gray60", text="FisiCoins: " + str(controller.FisiCoins), font=("Microsoft YaHei UI Light", 12))
+        self.Label6.place(x=710, y=350)
     def salirPagina(self):
+        self.controller.show_frame(MenuOpciones)
+        self.Label6.destroy()
         self.Label5.destroy()
         self.Label4.destroy()
         self.Label3.destroy()
         self.Label2.destroy()
         self.Label.destroy()
-        self.controller.show_frame(MenuOpciones)
+
 
 class Aplicacion(tk.Tk):
+    FisiCoins = 0
+    codigoEstudiante = 0
+    nombreEstudiante = ""
+    correoEstudiante = ""
+    creditos = 0
+    tipoEstudiante = ""
 
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
@@ -220,6 +211,9 @@ class Aplicacion(tk.Tk):
     def show_frame(self, page):
         frame = self.frames[page]
         frame.tkraise()
+
+    def modificarFisiCoins(self, nuevoValor):
+        self.FisiCoins = nuevoValor
 
 if __name__ == '__main__':
     app = Aplicacion()
