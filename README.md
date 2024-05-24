@@ -21,7 +21,7 @@ Instalar en la terminal de su IDE:
 
 pip install pillow
 
-pip install tkinter
+pip install tk
 
 pip install customtkinter
 
