@@ -7,6 +7,11 @@ import pandas as pd
 from customtkinter import *
 #importamos las librerias tk, customtkinter, pillow y pandas
 
+#funcion para eliminar los widgets dentro de nuestro labelframe (limpiar los datos que aparecen al presionar un botton)
+def eliminar_widgets_labelframe(frame):
+    for widget in frame.winfo_children():
+        widget.destroy()
+
 #Clase Login, clase hija de la clase Aplicacion
 class Login(tk.Frame):
 
@@ -15,8 +20,8 @@ class Login(tk.Frame):
         tk.Frame.__init__(self, parent)
 
         #Colocamos el fondo de san marcos
-        fondounmsm = ImageTk.PhotoImage(file="C:/Users/Kevin/Desktop/Proyecto Algoritmica/bgr.png")
-        rutaicono = "C:/Users/Kevin/Desktop/Proyecto Algoritmica/logofisi.png"
+        fondounmsm = ImageTk.PhotoImage(file="bgr.png")
+        rutaicono = "logofisi.png"
         img1 = Image.open(rutaicono)
         img1 = img1.resize((155, 155))
 
@@ -102,51 +107,71 @@ class MenuOpciones(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         #hacemos un bordemenu, con la misma funcionalidad que el borde de Login xd
-        bordeMenu = tk.LabelFrame(self, bg='purple4', bd=10, font=("Microsoft YaHei UI Light", 15))
+        bordeMenu = tk.LabelFrame(self, bg='darkslategray', bd=10, font=("Microsoft YaHei UI Light", 15))
         bordeMenu.pack(fill="both", expand=True)
 
         #partes del diseño, los rectangulos morados :p
-        label_3 = CTkLabel(bordeMenu, fg_color="magenta4", bg_color="purple4", text="", corner_radius=16, width=390,
+        label_3 = CTkLabel(bordeMenu, fg_color="teal", bg_color="darkslategray", text="", corner_radius=16, width=360,
                            height=240)
         label_3.place(x=500, y=15)
-        label_4 = CTkLabel(bordeMenu, fg_color="purple3", bg_color="magenta4", text="", corner_radius=16, width=370,
+        label_4 = CTkLabel(bordeMenu, fg_color="darkslategray", bg_color="teal", text="", corner_radius=16, width=340,
                            height=240)
         label_4.place(x=510, y=25)
 
-        textito = CTkLabel(bordeMenu, text="MENU DE OPCIONES", font=("Times New Roman", 30), width=300, height=35, text_color="gold2", bg_color="purple3")
-        textito.place(x=550, y=31)
+        textito = CTkLabel(bordeMenu, text="MENÚ", font=("Nunito", 30), width=300, height=35, text_color="gold2", bg_color="darkslategray")
+        textito.place(x=535, y=31)
 
-        label_2 = CTkLabel(bordeMenu, fg_color="magenta4", bg_color="purple4", text="", corner_radius=16, width=1180,
+        label_2 = CTkLabel(bordeMenu, fg_color="teal", bg_color="darkslategray", text="", corner_radius=16, width=1187,
                            height=540)
         label_2.place(x=85, y=70)
-        label_1 = CTkLabel(bordeMenu, fg_color="purple3", bg_color="magenta4", text="", corner_radius=16, width=1160,
+        label_1 = CTkLabel(bordeMenu, fg_color="darkslategray", bg_color="teal", text="", corner_radius=16, width=1167,
                             height=520)
         label_1.place(x=95, y=80)
 
-        #insertamos la imagen del burrito
-        burrito_path = os.path.join(os.path.dirname(__file__), 'burrito.jpg')
-        image = customtkinter.CTkImage(light_image= Image.open(burrito_path), size=(250, 147))
+        #insertamos la imagen de la fisicoin
+        burrito_path = os.path.join(os.path.dirname(__file__), 'FisiCoin.png')
+        image = customtkinter.CTkImage(light_image= Image.open(burrito_path), size=(210, 147))
         image_label = customtkinter.CTkLabel(bordeMenu, image=image, text='')
-        image_label.place(x=555, y=272)
+        image_label.place(x=570, y=265)
 
         #las diferentes tipos de opciones, hover_color cambiar el color cuando el mouse este encima
         #buttoon, tiene un command para ir a Operaciones Bancarias
-        buttoon = CTkButton(bordeMenu, width=550, bg_color="purple3", text_color="black", corner_radius=16, height=150, fg_color="green4", hover_color="green3",text="Operaciones Bancarias", font=("Microsoft YaHei UI Light", 30), command=lambda: controller.show_frame(InfoUsuario))
-        buttoon.place(x=120, y=110)
 
-        buttoon1 = CTkButton(bordeMenu, width=550, bg_color="purple3", text_color="black", corner_radius=16, height=150,  fg_color="red4", hover_color="red2", text="Pagar Servicios", font=("Microsoft YaHei UI Light", 30))
+            #Borde operaciones bancarias
+        label_2 = CTkLabel(bordeMenu, fg_color="teal", bg_color="darkslategray", text="", corner_radius=32, width=545,
+                           height=145)
+        label_2.place(x=115, y=105)
+            #Boton OPERACIONES BANCARIAS
+        buttoon = CTkButton(bordeMenu, width=515, bg_color="teal", text_color="white", corner_radius=32, height=135, fg_color="lightseagreen", hover_color="darkcyan",text="Operaciones Bancarias", font=("Nunito", 35), command=lambda: controller.show_frame(InfoUsuario))
+        buttoon.place(x=130, y=110)
+             #Borde pagar servicios
+        label_2 = CTkLabel(bordeMenu, fg_color="teal", bg_color="darkslategray", text="", corner_radius=32, width=560,
+                           height=145)
+        label_2.place(x=675, y=105)
+             #Boton PAGAR SERVICIOS
+        buttoon1 = CTkButton(bordeMenu, width=530, bg_color="teal", text_color="white", corner_radius=32, height=135,  fg_color="lightseagreen", hover_color="darkcyan", text="Pagar Servicios", font=("Nunito", 35))
         buttoon1.place(x=690, y=110)
+             #Boton PROXIMAMENTE QUIOSCO
+        buttoon2 = CTkButton(bordeMenu, width=420, bg_color="darkslategray", text_color="black", corner_radius=32, height=150, text="Proximamente:\nQuiosco Virtual", font=("Microsoft YaHei UI Light", 30))
+        buttoon2.place(x=120, y=262)
+             #Boton PROXIMAMENTE CASINO
+        buttoon3 = CTkButton(bordeMenu, width=420, bg_color="darkslategray", text_color="black", corner_radius=32, height=150, text="Proximamente:\n Casino", font=("Microsoft YaHei UI Light", 30))
+        buttoon3.place(x=820, y=262)
+        #Borde Configuracion
+        label_2 = CTkLabel(bordeMenu, fg_color="teal", bg_color="darkslategray", text="", corner_radius=32, width=545,
+                           height=145)
+        label_2.place(x=115, y=425)
+        #Boton CONFIGURACION
+        buttoon4 = CTkButton(bordeMenu, width=515, bg_color="teal", text_color="white", corner_radius=32, height=135, fg_color="lightseagreen", hover_color="darkcyan", text="Configuracion", font=("Nunito", 35))
+        buttoon4.place(x=130, y=430)
 
-        buttoon2 = CTkButton(bordeMenu, width=420, bg_color="purple3", text_color="black", corner_radius=16, height=150, text="Proximamente:\nQuiosco Virtual", font=("Microsoft YaHei UI Light", 30))
-        buttoon2.place(x=120, y=270)
+        #Borde Inversiones
+        label_2 = CTkLabel(bordeMenu, fg_color="teal", bg_color="darkslategray", text="", corner_radius=32, width=560,
+                           height=145)
+        label_2.place(x=675, y=425)
 
-        buttoon3 = CTkButton(bordeMenu, width=420, bg_color="purple3", text_color="black", corner_radius=16, height=150, text="Proximamente:\n Casino", font=("Microsoft YaHei UI Light", 30))
-        buttoon3.place(x=820, y=270)
-
-        buttoon4 = CTkButton(bordeMenu, width=550, bg_color="purple3", text_color="black", corner_radius=16, height=150, fg_color="blue4", hover_color="blue", text="Configuracion", font=("Microsoft YaHei UI Light", 30))
-        buttoon4.place(x=120, y=430)
-
-        buttoon5 = CTkButton(bordeMenu, width=550, bg_color="purple3", text_color="black", corner_radius=16, height=150, fg_color="yellow4", hover_color="yellow3", text="Prestamos e Inversiones", font=("Microsoft YaHei UI Light", 30))
+        #Boton INVERSIONES
+        buttoon5 = CTkButton(bordeMenu, width=530, bg_color="teal", text_color="white", corner_radius=32, height=135, fg_color="lightseagreen", hover_color="darkcyan", text="Prestamos e Inversiones", font=("Nunito", 35))
         buttoon5.place(x=690, y=430)
 
         #cerrar sesion, para volve al login
@@ -159,64 +184,71 @@ class InfoUsuario(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
-        bordeInfo = tk.LabelFrame(self, bg='gray22', bd=10, font=("Microsoft YaHei UI Light", 15))
+        bordeInfo = tk.LabelFrame(self, bg='#010f4c', bd=10, font=("Microsoft YaHei UI Light", 15))
         bordeInfo.pack(fill="both", expand=True)
 
         #los rectangulos gris y azul, debajo de donde estar el texto xd
-        label_bg = CTkLabel(bordeInfo, fg_color="blue", bg_color="gray22", text="", corner_radius=16, width=444, height=590)
+        label_bg = CTkLabel(bordeInfo, fg_color="#0026a3", bg_color="#010f4c", text="", corner_radius=16, width=444, height=590)
         label_bg.place(y=30, x=687)
-        label_bg1 = CTkLabel(bordeInfo, fg_color="gray60", bg_color="blue", text="", corner_radius=16, width=420, height=570)
+        label_bg1 = CTkLabel(bordeInfo, fg_color="#0084f1", bg_color="#0026a3", text="", corner_radius=16, width=420, height=570)
         label_bg1.place(y=40, x=699)
-        label_bg2 = CTkLabel(bordeInfo, fg_color="blue", bg_color="gray22", text="", corner_radius=16, width=444, height=590)
+        label_bg2 = CTkLabel(bordeInfo, fg_color="#0026a3", bg_color="#010f4c", text="", corner_radius=16, width=444, height=590)
         label_bg2.place(y=30, x=215)
-        label_bg3 = CTkLabel(bordeInfo, fg_color="gray60", bg_color="blue", text="", corner_radius=16, width=420, height=570)
+        label_bg3 = CTkLabel(bordeInfo, fg_color="#0084f1", bg_color="#0026a3", text="", corner_radius=16, width=420, height=570)
         label_bg3.place(y=40, x=227)
 
         #boton, que activa la funcion MostrarInformacio
-        bottonsito2 = CTkButton(bordeInfo, text="Mostrar Informacion", bg_color="gray60", fg_color="gray50", width=392, height=45, corner_radius=8, font=("Microsoft YaHei UI Light", 15), command= lambda:self.mostrarDatos(controller))
+        bottonsito2 = CTkButton(bordeInfo, text="Consultar Saldo", bg_color="#0084f1", fg_color="#4bb4f6", width=392, height=45, corner_radius=8, font=("Microsoft YaHei UI Light", 15), command= lambda:self.consultarSaldo(controller, respuestaLabelFrame))
         bottonsito2.place(x=240, y=52)
         #el resto de botones, que no hacen nada por el momento
-        bottonsito3 = CTkButton(bordeInfo, text="Consultar Saldo", bg_color="gray60", fg_color="gray50", width=392,
+        bottonsito3 = CTkButton(bordeInfo, text="Realizar deposito", bg_color="#0084f1", fg_color="#4bb4f6", width=392,
                                 height=45, corner_radius=8, font=("Microsoft YaHei UI Light", 15))
         bottonsito3.place(x=240, y=102)
 
-        bottonsito4 = CTkButton(bordeInfo, text="Realizar Retiro", bg_color="gray60", fg_color="gray50", width=392,
+        bottonsito4 = CTkButton(bordeInfo, text="Realizar Retiro", bg_color="#0084f1", fg_color="#4bb4f6", width=392,
                                 height=45, corner_radius=8, font=("Microsoft YaHei UI Light", 15))
         bottonsito4.place(x=240, y=152)
 
-        bottonsito5 = CTkButton(bordeInfo, text="Transferencia entre cuentas", bg_color="gray60", fg_color="gray50", width=392,
+        bottonsito5 = CTkButton(bordeInfo, text="Transferencia entre cuentas", bg_color="#0084f1", fg_color="#4bb4f6", width=392,
                                 height=45, corner_radius=8, font=("Microsoft YaHei UI Light", 15))
         bottonsito5.place(x=240, y=202)
         #boton para volver, ojo, tiene SalirPagina()
-        Buttona = tk.Button(self, text="Volver", font=("Arial", 15), command=lambda: self.salirPagina())
+        Buttona = tk.Button(self, text="Volver", font=("Arial", 15), command=lambda: self.salirPagina(respuestaLabelFrame))
         Buttona.place(x=50, y=600)
 
+        #este nuevo labelframe esta dentro de nuestro labelframe BordeInfo
+        #su funcion es que dentro de este esten todos los widgets de nuestra opciones, consultar saldo, realizar retiro, etc
+        #almacenar los widgets que generen nuestros botones dentro de un labelframe nos facilitara el borrarlos cuando sea necesario
+        #con solo llamar a lafuncion eliminar_widgets_labelframe ,podras borrar todos los widgets que generaste dentro de tu botton
+        respuestaLabelFrame = tk.LabelFrame(bordeInfo, text="", height=550, width=400, bg="#0084f1", foreground="gray60",
+                                            bd=0, font=("Microsoft YaHei UI Light", 15))
+        respuestaLabelFrame.place(x=708, y=53)
+        #este labelframe es el segundo rectangulo, a la derechad de las opciones
+
     #mostrarDatos, funcion que necesita el argumento controller
-    def mostrarDatos(self, controller):
+    def consultarSaldo(self, controller, frame):
+        eliminar_widgets_labelframe(frame)
+        #limpiamos lo que este dentro de nuestro labelframe, antes de generar nuevos widgets
+        
         self.controller = controller
         #escribimos todos los datos llamando a controller.  que es igual a Aplicacion., estamos llamando las variables de Aplicacion
-        self.Label = tk.Label(self, fg="white", bg="gray60", text="Codigo de estudiante: "+str(controller.codigoEstudiante), font=("Microsoft YaHei UI Light", 12))
-        self.Label.place(x=710, y=100)
-        self.Label2 = tk.Label(self, fg="white", bg="gray60", text="Correo Institucional: "+controller.correoEstudiante, font=("Microsoft YaHei UI Light", 12))
-        self.Label2.place(x=710, y=150)
-        self.Label3 = tk.Label(self, fg="white", bg="gray60", text="Creditos: "+str(controller.creditos), font=("Microsoft YaHei UI Light", 12))
-        self.Label3.place(x=710, y=200)
-        self.Label4 = tk.Label(self, fg="white", bg="gray60", text="Nombre del Estudiante: "+controller.nombreEstudiante, font=("Microsoft YaHei UI Light", 11))
-        self.Label4.place(x=710, y=250)
-        self.Label5 = tk.Label(self, fg="white", bg="gray60", text="Tipo de Estudiante: " + controller.tipoEstudiante, font=("Microsoft YaHei UI Light", 12))
-        self.Label5.place(x=710, y=300)
-        self.Label6 = tk.Label(self, fg="white", bg="gray60", text="FisiCoins: " + str(controller.FisiCoins), font=("Microsoft YaHei UI Light", 12))
-        self.Label6.place(x=710, y=350)
+        self.Label = tk.Label(frame, fg="white", bg="gray60", text="Codigo de estudiante: "+str(controller.codigoEstudiante), font=("Microsoft YaHei UI Light", 12))
+        self.Label.place(x=0, y=0)
+        self.Label2 = tk.Label(frame, fg="white", bg="gray60", text="Correo Institucional: "+controller.correoEstudiante, font=("Microsoft YaHei UI Light", 12))
+        self.Label2.place(x=0, y=50)
+        self.Label3 = tk.Label(frame, fg="white", bg="gray60", text="Creditos: "+str(controller.creditos), font=("Microsoft YaHei UI Light", 12))
+        self.Label3.place(x=0, y=100)
+        self.Label4 = tk.Label(frame, fg="white", bg="gray60", text="Nombre del Estudiante: "+controller.nombreEstudiante, font=("Microsoft YaHei UI Light", 11))
+        self.Label4.place(x=0, y=150)
+        self.Label5 = tk.Label(frame, fg="white", bg="gray60", text="Tipo de Estudiante: " + controller.tipoEstudiante, font=("Microsoft YaHei UI Light", 12))
+        self.Label5.place(x=0, y=200)
+        self.Label6 = tk.Label(frame, fg="white", bg="gray60", text="FisiCoins: " + str(controller.FisiCoins), font=("Microsoft YaHei UI Light", 12))
+        self.Label6.place(x=0, y=250)
 
     #al salir de la pagina, debemos eliminar los Label que creamos en MostrarInformacion
-    def salirPagina(self):
-        self.controller.show_frame(MenuOpciones)
-        self.Label6.destroy()
-        self.Label5.destroy()
-        self.Label4.destroy()
-        self.Label3.destroy()
-        self.Label2.destroy()
-        self.Label.destroy()
+    def salirPagina(self, frame):
+        eliminar_widgets_labelframe(frame) #eliminamos los widgets antes de salir del frame
+        self.controller.show_frame(MenuOpciones) #volvemos al menu de opciones
 
 #Clase Aplicacion, donde creamos la ventana por la que pasaran los frames
 class Aplicacion(tk.Tk):
