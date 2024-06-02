@@ -58,7 +58,7 @@ class Login(tk.Frame):
         T1 = CTkEntry(borde, placeholder_text="Correo Institucional", font=("Microsoft YaHei UI Light", 15), width=300, height=35, text_color="gray90", bg_color="gray22", fg_color="gray26")
         T1.place(x=530, y=340)
         #En el T2 lo ocultamos con show="*"
-        T2 = CTkEntry(borde, show="*", placeholder_text="Codigo de Estudiante", font=("Microsoft YaHei UI Light", 15), width=300, height=35, text_color="gray90", bg_color="gray22", fg_color="gray26")
+        T2 = CTkEntry(borde, show="*", placeholder_text="Contraseña", font=("Microsoft YaHei UI Light", 15), width=300, height=35, text_color="gray90", bg_color="gray22", fg_color="gray26")
         T2.place(x=530, y=390)
 
         #un boton next para pasar a la siguiente ventana rapido, para testeos, no necesitaras ingresar el usuario
@@ -71,26 +71,28 @@ class Login(tk.Frame):
             try: #Intentemos leer el archivo excel
                 df = pd.read_excel('loginData.xlsx')
                 if (str(T1.get()) in df["Correo"].values): #revisamos si el texto en T1 esta en la columna "Correo" del excel
-                    if df[df["Correo"] == str(T1.get())]["Codigo"].iloc[0] == int(T2.get()): #sacamos el numero de la fila donde se encuentra
+                    if str(df[df["Correo"] == str(T1.get())]["Contraseña"].iloc[0]) == str(T2.get()): #sacamos el numero de la fila donde se encuentra
                         # nuestro Correo, sacamos el Codigo de alumno de esa fila y lo igualamos al T2 escrito por el usuario
                         #los messagebox son cuadros emergentes al que les pones un titulo y mensaje
                         messagebox.showinfo("Acceso Correcto", "Has ingresado")
                         #la variable numFila, guardara el numero de la fila donde se encuentra nuestro usuario en el excel
-                        numFila = df[df["Codigo"] == int(T2.get())]
+                        numFila = df[df["Correo"] == str(T1.get())]
                         #hacemos que las variables de la clase Aplicacion guarden los datos que estan en el excel
                         controller.creditos = str(numFila["Creditos"].iloc[0])
                         controller.nombreEstudiante = numFila["Nombre"].iloc[0]
+                        controller.dni = numFila["DNI"].iloc[0]
                         controller.FisiCoins = numFila["Dinero"].iloc[0]
                         controller.tipoEstudiante = (numFila["Tipo"].iloc[0])
-                        controller.codigoEstudiante = str(int(T2.get()))
+                        controller.codigoEstudiante = numFila["Codigo"].iloc[0]
                         controller.correoEstudiante = str(T1.get())
+                        controller.contraseña = str(numFila["Contraseña"].iloc[0])
                         #como ya se verifico que es correcto el correo y codigo, borramos lo escrito en los campos T1 y T2
                         T1.delete(0, tk.END)
                         T2.delete(0, tk.END)
                         #pasamos al frame MenuOpciones
                         controller.show_frame(MenuOpciones)
                     else:
-                        messagebox.showinfo("Acceso Incorrecto", "Codigo incorrecto")
+                        messagebox.showinfo("Acceso Incorrecto", "Contraseña incorrecta")
                 else:
                     messagebox.showinfo("Acceso Incorrecto", "Correo no existe")
             except FileNotFoundError:
@@ -101,77 +103,85 @@ class Login(tk.Frame):
 
 
 #clase MenuOpciones, clase hija de la clase Aplicacion
+#clase MenuOpciones, clase hija de la clase Aplicacion
 class MenuOpciones(tk.Frame):
 
     #Inicializamos la clase, self para referirse a si mismo (el login) y controller se refiere a su clase padre (Aplicacion)
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
+
+        #efecto de sobra radial
+
         #hacemos un bordemenu, con la misma funcionalidad que el borde de Login xd
-        bordeMenu = tk.LabelFrame(self, bg='darkslategray', bd=10, font=("Microsoft YaHei UI Light", 15))
+        bordeMenu = tk.LabelFrame(self, bg='#05171d', bd=10, font=("Microsoft YaHei UI Light", 15))
         bordeMenu.pack(fill="both", expand=True)
 
-        #partes del diseño, los rectangulos morados :p
-        label_3 = CTkLabel(bordeMenu, fg_color="teal", bg_color="darkslategray", text="", corner_radius=16, width=360,
+
+
+        #partes del diseño, los rectangulos morados :P
+
+        #rectanculos verticales
+        label_3 = CTkLabel(bordeMenu, fg_color="#88d398", bg_color="#01213a", text="", corner_radius=8, width=380,
                            height=240)
-        label_3.place(x=500, y=15)
-        label_4 = CTkLabel(bordeMenu, fg_color="darkslategray", bg_color="teal", text="", corner_radius=16, width=340,
+        label_3.place(x=505, y=22)
+        label_4 = CTkLabel(bordeMenu, fg_color="#01213a", bg_color="#88d398", text="", corner_radius=8, width=370,
                            height=240)
         label_4.place(x=510, y=25)
 
-        textito = CTkLabel(bordeMenu, text="MENÚ", font=("Nunito", 30), width=300, height=35, text_color="gold2", bg_color="darkslategray")
-        textito.place(x=535, y=31)
-
-        label_2 = CTkLabel(bordeMenu, fg_color="teal", bg_color="darkslategray", text="", corner_radius=16, width=1187,
-                           height=540)
-        label_2.place(x=85, y=70)
-        label_1 = CTkLabel(bordeMenu, fg_color="darkslategray", bg_color="teal", text="", corner_radius=16, width=1167,
+        textito = CTkLabel(bordeMenu, text="MENÚ", font=("Nunito", 30), width=300, height=35, text_color="#e3f473", bg_color="#01213a")
+        textito.place(x=550, y=31)
+        #rectanculos horizontales
+        label_2 = CTkLabel(bordeMenu, fg_color="#88d398", text="", corner_radius=10, width=1166,
+                           height=530)
+        label_2.place(x=92, y=75)
+        label_1 = CTkLabel(bordeMenu, fg_color="#01213a", bg_color="#88d398", text="", corner_radius=10, width=1160,
                             height=520)
         label_1.place(x=95, y=80)
 
         #insertamos la imagen de la fisicoin
-        burrito_path = os.path.join(os.path.dirname(__file__), 'FisiCoin.png')
+        burrito_path = os.path.join(os.path.dirname(__file__), 'FISICOIN.png')
         image = customtkinter.CTkImage(light_image= Image.open(burrito_path), size=(210, 147))
-        image_label = customtkinter.CTkLabel(bordeMenu, image=image, text='')
+        image_label = customtkinter.CTkLabel(bordeMenu, bg_color="#01213a", image=image, text='')
         image_label.place(x=570, y=265)
 
         #las diferentes tipos de opciones, hover_color cambiar el color cuando el mouse este encima
         #buttoon, tiene un command para ir a Operaciones Bancarias
 
             #Borde operaciones bancarias
-        label_2 = CTkLabel(bordeMenu, fg_color="teal", bg_color="darkslategray", text="", corner_radius=32, width=545,
+        label_2 = CTkLabel(bordeMenu, fg_color="#88d398", bg_color="#01213a", text="", corner_radius=12, width=534,
                            height=145)
         label_2.place(x=115, y=105)
             #Boton OPERACIONES BANCARIAS
-        buttoon = CTkButton(bordeMenu, width=515, bg_color="teal", text_color="white", corner_radius=32, height=135, fg_color="lightseagreen", hover_color="darkcyan",text="Operaciones Bancarias", font=("Nunito", 35), command=lambda: controller.show_frame(InfoUsuario))
-        buttoon.place(x=130, y=110)
+        buttoon = CTkButton(bordeMenu, width=530, bg_color="#88d398", text_color="white", corner_radius=12, height=135, fg_color="#114b5f", hover_color="darkcyan",text="Operaciones Bancarias", font=("Nunito", 35), command=lambda: controller.show_frame(InfoUsuario))
+        buttoon.place(x=117, y=110)
              #Borde pagar servicios
-        label_2 = CTkLabel(bordeMenu, fg_color="teal", bg_color="darkslategray", text="", corner_radius=32, width=560,
+        label_2 = CTkLabel(bordeMenu, fg_color="#88d398", bg_color="#01213a", text="", corner_radius=12, width=534,
                            height=145)
-        label_2.place(x=675, y=105)
+        label_2.place(x=688, y=105)
              #Boton PAGAR SERVICIOS
-        buttoon1 = CTkButton(bordeMenu, width=530, bg_color="teal", text_color="white", corner_radius=32, height=135,  fg_color="lightseagreen", hover_color="darkcyan", text="Pagar Servicios", font=("Nunito", 35))
+        buttoon1 = CTkButton(bordeMenu, width=530, bg_color="#88d398", text_color="white", corner_radius=12, height=135,  fg_color="#114b5f", hover_color="darkcyan", text="Pagar Servicios", font=("Nunito", 35))
         buttoon1.place(x=690, y=110)
              #Boton PROXIMAMENTE QUIOSCO
-        buttoon2 = CTkButton(bordeMenu, width=420, bg_color="darkslategray", text_color="black", corner_radius=32, height=150, text="Proximamente:\nQuiosco Virtual", font=("Microsoft YaHei UI Light", 30))
-        buttoon2.place(x=120, y=262)
+        buttoon2 = CTkButton(bordeMenu, width=420, bg_color="#01213a", fg_color="#575f61", text_color="black", corner_radius=32, height=150, text="Proximamente:\nQuiosco Virtual", font=("Microsoft YaHei UI Light", 30))
+        buttoon2.place(x=120, y=265)
              #Boton PROXIMAMENTE CASINO
-        buttoon3 = CTkButton(bordeMenu, width=420, bg_color="darkslategray", text_color="black", corner_radius=32, height=150, text="Proximamente:\n Casino", font=("Microsoft YaHei UI Light", 30))
-        buttoon3.place(x=820, y=262)
+        buttoon3 = CTkButton(bordeMenu, width=420, bg_color="#01213a", fg_color="#575f61", text_color="black", corner_radius=32, height=150, text="Proximamente:\n Casino", font=("Microsoft YaHei UI Light", 30))
+        buttoon3.place(x=810, y=265)
         #Borde Configuracion
-        label_2 = CTkLabel(bordeMenu, fg_color="teal", bg_color="darkslategray", text="", corner_radius=32, width=545,
+        label_2 = CTkLabel(bordeMenu, fg_color="#88d398", bg_color="#01213a", text="", corner_radius=12, width=534,
                            height=145)
         label_2.place(x=115, y=425)
         #Boton CONFIGURACION
-        buttoon4 = CTkButton(bordeMenu, width=515, bg_color="teal", text_color="white", corner_radius=32, height=135, fg_color="lightseagreen", hover_color="darkcyan", text="Configuracion", font=("Nunito", 35))
-        buttoon4.place(x=130, y=430)
+        buttoon4 = CTkButton(bordeMenu, width=530, bg_color="#88d398", text_color="white", corner_radius=12, height=135, fg_color="#114b5f",  hover_color="darkcyan", text="Configuracion", font=("Nunito", 35), command=lambda: controller.show_frame(Config))
+        buttoon4.place(x=117, y=430)
 
         #Borde Inversiones
-        label_2 = CTkLabel(bordeMenu, fg_color="teal", bg_color="darkslategray", text="", corner_radius=32, width=560,
+        label_2 = CTkLabel(bordeMenu, fg_color="#88d398", bg_color="#01213a", text="", corner_radius=12, width=534,
                            height=145)
-        label_2.place(x=675, y=425)
+        label_2.place(x=688, y=425)
 
         #Boton INVERSIONES
-        buttoon5 = CTkButton(bordeMenu, width=530, bg_color="teal", text_color="white", corner_radius=32, height=135, fg_color="lightseagreen", hover_color="darkcyan", text="Prestamos e Inversiones", font=("Nunito", 35))
+        buttoon5 = CTkButton(bordeMenu, width=530, bg_color="#88d398", text_color="white", corner_radius=12, height=135,  fg_color="#114b5f", hover_color="darkcyan", text="Prestamos e Inversiones", font=("Nunito", 35))
         buttoon5.place(x=690, y=430)
 
         #cerrar sesion, para volve al login
@@ -250,6 +260,105 @@ class InfoUsuario(tk.Frame):
         eliminar_widgets_labelframe(frame) #eliminamos los widgets antes de salir del frame
         self.controller.show_frame(MenuOpciones) #volvemos al menu de opciones
 
+
+class Config(tk.Frame):
+
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller
+        bordeContra = tk.LabelFrame(self, bg='#20ace8', bd=10, font=("Microsoft YaHei UI Light", 15))
+        bordeContra.pack(fill="both", expand=True)
+
+        # Rectangulos
+
+        label_bg1 = CTkLabel(bordeContra, fg_color="#25e8e8", bg_color="#20ace8", text="", corner_radius=16, width=979,
+                             height=460)
+        label_bg1.place(y=40, x=210)
+
+        # Titulo del frame
+        self.Label = tk.Label(self, fg="black", bg="#25e8e8", text="Cambiar contraseña ",
+                              font=("Microsoft YaHei UI Light", 20, "bold"))
+        self.Label.place(x=590, y=90)
+        # validar contraseña antigua
+        self.Label1 = tk.Label(self, fg="black", bg="#25e8e8", text="Contraseña antigua: ",
+                               font=("Microsoft YaHei UI Light", 17))
+        self.Label1.place(x=260, y=190)
+        self.C1 = CTkEntry(bordeContra, show="*", placeholder_text="Introduzca su contraseña actual",
+                      font=("Microsoft YaHei UI Light", 15), width=300, height=35, text_color="black",
+                      bg_color="#25e8e8", fg_color="white")
+        self.C1.place(x=670, y=190)
+
+        self.nuevaContraLabelFrame = tk.LabelFrame(bordeContra, text="", height=250, width=800, bg="#25e8e8", foreground="gray60",
+                                            bd=0, font=("Microsoft YaHei UI Light", 15))
+        self.nuevaContraLabelFrame.place(x=230, y=240)
+
+        # boton para volver, ojo, tiene SalirPagina()
+        Buttona = tk.Button(bordeContra, text="Volver", font=("Arial", 15), command=lambda: self.salirPagina(self.nuevaContraLabelFrame))
+        Buttona.place(x=50, y=600)
+
+        bottonNuevoFrame = CTkButton(bordeContra, text="Validar", text_color="black", bg_color="#25e8e8", fg_color="gray60",
+                width=100, height=40, corner_radius=8, font=("Microsoft YaHei UI Light", 16),
+                command= lambda: self.ValidarContraseñaAntigua(controller))
+        bottonNuevoFrame.place(x=1000, y=185)
+    def ValidarContraseñaAntigua(self, controller):
+        if controller.contraseña == self.C1.get():
+            messagebox.showinfo("Correcto", "Contraseña antigua verificada :)")
+            self.mostrarCambioContra(controller, self.nuevaContraLabelFrame)
+        else:
+            messagebox.showinfo("Error", "Contraseña antigua incorrecta")
+
+
+    def mostrarCambioContra(self, controller, frame):
+        eliminar_widgets_labelframe(frame)
+
+        self.Label2 = tk.Label(self, fg="black", bg="#25e8e8", text="Contraseña nueva: ",
+                               font=("Microsoft YaHei UI Light", 17))
+        self.Label2.place(x=260, y=260)
+        self.Label3 = tk.Label(self, fg="black", bg="#25e8e8", text="Reescriba la contraseña: ",
+                               font=("Microsoft YaHei UI Light", 17))
+        self.Label3.place(x=260, y=330)
+
+        self.C2 = CTkEntry(self, show="*", placeholder_text="Introduzca la nueva contraseña",
+                      font=("Microsoft YaHei UI Light", 15), width=300, height=35, text_color="black",
+                      bg_color="#25e8e8", fg_color="white")
+        self.C2.place(x=680, y=260)
+        self.C3 = CTkEntry(self, show="*", placeholder_text="Confirmar nueva contraseña",
+                      font=("Microsoft YaHei UI Light", 15), width=300, height=35, text_color="black",
+                      bg_color="#25e8e8", fg_color="white")
+        self.C3.place(x=680, y=330)
+
+        def enviar():
+             if len(str(self.C2.get())) >= 8:
+                if (self.C2.get()).isalnum():
+                    if (self.C2.get()) == (self.C3.get()):
+                        df = pd.read_excel('loginData.xlsx')
+                        df['Contraseña'] = df['Contraseña'].astype(str)
+                        numFila = df[df["Contraseña"] == str(self.C1.get())]
+                        indiceFila = numFila.index[0]
+                        df.loc[indiceFila, "Contraseña"] = str(self.C2.get())
+                        df.to_excel("LoginData.xlsx", index=False)
+                        controller.contraseña = str(self.C2.get())
+                        messagebox.showinfo("Contraseña cambiada!", "Su nueva contraseña es: {}".format(controller.contraseña))
+                        eliminar_widgets_labelframe(frame)
+                    else:
+                        messagebox.showinfo("Error", "La confirmación de la nueva contraseña no coincide")
+                else:
+                    messagebox.showinfo("Error", "La nueva contraseña solo debe contener números y letras.")
+             else:
+                messagebox.showinfo("Error", "La nueva contraseña debe tener al menos 8 caracteres.")
+
+
+        # BOTON para cambiar la contraseña
+        cambiarcontra = CTkButton(self, text="Enviar", text_color="black", bg_color="#25e8e8", fg_color="gray60",
+                                  width=392,
+                                  height=45, corner_radius=8, font=("Microsoft YaHei UI Light", 16), command= enviar)
+        cambiarcontra.place(x=500, y=420)
+
+    # para el boton volver
+    def salirPagina(self, frame):
+        eliminar_widgets_labelframe(frame)
+        self.controller.show_frame(MenuOpciones)
+
 #Clase Aplicacion, donde creamos la ventana por la que pasaran los frames
 class Aplicacion(tk.Tk):
     #variables que usaremos
@@ -259,6 +368,8 @@ class Aplicacion(tk.Tk):
     correoEstudiante = ""
     creditos = 0
     tipoEstudiante = ""
+    contraseña = ""
+    dni = 0
 
     #inicializamos la clase
     def __init__(self, *args, **kwargs):
@@ -280,7 +391,7 @@ class Aplicacion(tk.Tk):
         #el diccionario te permite almacenar distintos valores, no solo tipos de datos primitivos
         #como el array en c++, pero con mas capacidades
         self.frames = {}
-        for F in (Login, MenuOpciones, InfoUsuario): #hacemos que F recorra Login, MenuOpciones, InfoUsuario (hara 3 vueltas xd)
+        for F in (Login, MenuOpciones, InfoUsuario, Config): #hacemos que F recorra Login, MenuOpciones, InfoUsuario (hara 3 vueltas xd)
             frame = F(window, self)  # esta parte de aca inicializa las subclases de Aplicacion
             #de esta manera: en la primera vuelta F sera Login, lo que hara
             #frame = Login(window, self) esto creara el Login, lo mismo pasara en la 2da y 3ra vuelta
