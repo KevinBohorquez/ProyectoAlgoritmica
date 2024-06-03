@@ -85,10 +85,8 @@ class Login(tk.Frame):
 
             try:  # Intentemos leer el archivo excel
                 df = pd.read_excel('loginData.xlsx')
-                if (str(T1.get()) in df[
-                    "Correo"].values):  # revisamos si el texto en T1 esta en la columna "Correo" del excel
-                    if str(df[df["Correo"] == str(T1.get())]["Contraseña"].iloc[0]) == str(
-                            T2.get()):  # sacamos el numero de la fila donde se encuentra
+                if (str(T1.get()) in df["Correo"].values):  # revisamos si el texto en T1 esta en la columna "Correo" del excel
+                    if str(df[df["Correo"] == str(T1.get())]["Contraseña"].iloc[0]) == str(T2.get()):  # sacamos el numero de la fila donde se encuentra
                         # nuestro Correo, sacamos el Codigo de alumno de esa fila y lo igualamos al T2 escrito por el usuario
                         # los messagebox son cuadros emergentes al que les pones un titulo y mensaje
                         messagebox.showinfo("Acceso Correcto", "Has ingresado")
@@ -227,7 +225,7 @@ class InfoUsuario(tk.Frame):
         bordeInfo = tk.LabelFrame(self, bg='#010f4c', bd=10, font=("Microsoft YaHei UI Light", 15))
         bordeInfo.pack(fill="both", expand=True)
 
-        # los rectangulos gris y azul, debajo de donde estar el texto xd
+        # los rectangulos  azul, debajo de donde estar el texto xd
         label_bg = CTkLabel(bordeInfo, fg_color="#0026a3", bg_color="#010f4c", text="", corner_radius=16, width=444,
                             height=590)
         label_bg.place(y=30, x=687)
@@ -280,28 +278,34 @@ class InfoUsuario(tk.Frame):
         # limpiamos lo que este dentro de nuestro labelframe, antes de generar nuevos widgets
 
         self.controller = controller
+
+        self.Lab1 = CTkLabel(frame, text="", width=380, height=60, fg_color="#0026a3", corner_radius=16)
+        self.Lab1.place(x=10, y=7)
+        self.Lab2 = CTkLabel(frame, corner_radius=16, height=40, fg_color="#4bb4f6", bg_color="#0026a3", text="Consulta de Informacion", text_color="black", font=("Microsoft YaHei UI Light", 30))
+        self.Lab2.place(x=20, y=17)
+
         # escribimos todos los datos llamando a controller.  que es igual a Aplicacion., estamos llamando las variables de Aplicacion
-        self.Label = tk.Label(frame, fg="white", bg="gray60",
-                              text="Codigo de estudiante: " + str(controller.codigoEstudiante),
-                              font=("Microsoft YaHei UI Light", 12))
-        self.Label.place(x=0, y=0)
-        self.Label2 = tk.Label(frame, fg="white", bg="gray60",
-                               text="Correo Institucional: " + controller.correoEstudiante,
-                               font=("Microsoft YaHei UI Light", 12))
-        self.Label2.place(x=0, y=50)
-        self.Label3 = tk.Label(frame, fg="white", bg="gray60", text="Creditos: " + str(controller.creditos),
-                               font=("Microsoft YaHei UI Light", 12))
-        self.Label3.place(x=0, y=100)
-        self.Label4 = tk.Label(frame, fg="white", bg="gray60",
+        self.Label4 = tk.Label(frame, fg="white", bg="#0084f1",
                                text="Nombre del Estudiante: " + controller.nombreEstudiante,
                                font=("Microsoft YaHei UI Light", 11))
-        self.Label4.place(x=0, y=150)
-        self.Label5 = tk.Label(frame, fg="white", bg="gray60", text="Tipo de Estudiante: " + controller.tipoEstudiante,
+        self.Label4.place(x=5, y=400)
+        self.Label = tk.Label(frame, fg="white", bg="#0084f1",
+                              text="Codigo de estudiante: " + str(controller.codigoEstudiante),
+                              font=("Microsoft YaHei UI Light", 12))
+        self.Label.place(x=5, y=250)
+        self.Label2 = tk.Label(frame, fg="white", bg="#0084f1",
+                               text="Correo Institucional: " + controller.correoEstudiante,
                                font=("Microsoft YaHei UI Light", 12))
-        self.Label5.place(x=0, y=200)
-        self.Label6 = tk.Label(frame, fg="white", bg="gray60", text="FisiCoins: " + str(controller.FisiCoins),
+        self.Label2.place(x=5, y=300)
+        self.Label3 = tk.Label(frame, fg="white", bg="#0084f1", text="Creditos: " + str(controller.creditos),
                                font=("Microsoft YaHei UI Light", 12))
-        self.Label6.place(x=0, y=250)
+        self.Label3.place(x=5, y=350)
+        self.Label5 = tk.Label(frame, fg="white", bg="#0084f1", text="Tipo de Estudiante: " + controller.tipoEstudiante + "GRADO",
+                               font=("Microsoft YaHei UI Light", 12))
+        self.Label5.place(x=5, y=450)
+        self.Label6 = tk.Label(frame, fg="white", bg="#0084f1", text="FisiCoins: " + str(controller.FisiCoins),
+                               font=("Microsoft YaHei UI Light", 12))
+        self.Label6.place(x=5, y=500)
 
     # al salir de la pagina, debemos eliminar los Label que creamos en MostrarInformacion
     def salirPagina(self, frame):
@@ -651,8 +655,10 @@ class RealizarRetiro(tk.Frame):
                 messagebox.showerror("Error", "Fondos insuficientes")
             else:
                 self.controller.modificarFisiCoins(self.controller.FisiCoins - monto)
+                self.generar_factura_pdf(monto)
+                self.pdf_generado = True
                 messagebox.showinfo("Éxito", f"Has retirado {monto} FisiCoins")
-                self.controller.show_frame(InfoUsuario)
+
 
         except ValueError as ve:
             messagebox.showerror("Error", f"Entrada inválida: {ve}")
@@ -905,8 +911,7 @@ class TransferenciaDinero(tk.Frame):
         pdf_path = "factura_transaccion.pdf"
         if os.path.exists(pdf_path):
             os.remove(pdf_path)
-        else:
-            messagebox.showerror("Error", "El archivo PDF no existe.")
+
 
 
 class Config(tk.Frame):
@@ -979,18 +984,20 @@ class Config(tk.Frame):
         self.C3.place(x=680, y=330)
 
         def enviar():
+            df = pd.read_excel('loginData.xlsx', sheet_name='Sheet1')
+            df['Contraseña'] = df['Contraseña'].astype(str)
             if len(str(self.C2.get())) >= 8:
                 if (self.C2.get()).isalnum():
                     if (self.C2.get()) == (self.C3.get()):
-                        df = pd.read_excel('loginData.xlsx')
-                        df['Contraseña'] = df['Contraseña'].astype(str)
-                        numFila = df[df["Contraseña"] == str(self.C1.get())]
-                        indiceFila = numFila.index[0]
-                        df.loc[indiceFila, "Contraseña"] = str(self.C2.get())
-                        df.to_excel("LoginData.xlsx", index=False)
+                        filac = df.index[df["Contraseña"] == str(self.C1.get())].tolist()
+                        for i in filac:
+                            df.at[i, "Contraseña"] = str(self.C2.get())
                         controller.contraseña = str(self.C2.get())
-                        messagebox.showinfo("Contraseña cambiada!",
-                                            "Su nueva contraseña es: {}".format(controller.contraseña))
+                        df.to_excel("LoginData.xlsx", index=False)
+                        messagebox.showinfo("Contraseña cambiada!", "Su nueva contraseña es: {}".format(controller.contraseña))
+                        self.C1.delete(0, tk.END)
+                        self.C2.delete(0, tk.END)
+                        self.C3.delete(0, tk.END)
                         eliminar_widgets_labelframe(frame)
                     else:
                         messagebox.showinfo("Error", "La confirmación de la nueva contraseña no coincide")
