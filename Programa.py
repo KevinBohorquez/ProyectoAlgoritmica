@@ -15,7 +15,7 @@ import customtkinter
 from PIL import Image, ImageTk
 import pandas as pd
 from customtkinter import *
-
+import random
 
 # importamos las librerias tk, customtkinter, pillow y pandas
 
@@ -101,6 +101,7 @@ class Login(tk.Frame):
                         controller.codigoEstudiante = numFila["Codigo"].iloc[0]
                         controller.correoEstudiante = str(T1.get())
                         controller.contraseña = str(numFila["Contraseña"].iloc[0])
+                        controller.foto = str(numFila["Foto"].iloc[0])
                         # como ya se verifico que es correcto el correo y codigo, borramos lo escrito en los campos T1 y T2
                         T1.delete(0, tk.END)
                         T2.delete(0, tk.END)
@@ -177,7 +178,7 @@ class MenuOpciones(tk.Frame):
         label_2.place(x=688, y=105)
         # Boton PAGAR SERVICIOS
         buttoon1 = CTkButton(bordeMenu, width=530, bg_color="#88d398", text_color="white", corner_radius=12, height=135,
-                             fg_color="#114b5f", hover_color="darkcyan", text="Pagar Servicios", font=("Nunito", 35))
+                             fg_color="#114b5f", hover_color="darkcyan", text="Pagar Servicios", font=("Nunito", 35), command=lambda: controller.show_frame(pagarServicios))
         buttoon1.place(x=690, y=110)
         # Boton PROXIMAMENTE QUIOSCO
         buttoon2 = CTkButton(bordeMenu, width=420, bg_color="#01213a", fg_color="#575f61", text_color="black",
@@ -240,22 +241,21 @@ class InfoUsuario(tk.Frame):
         label_bg3.place(y=40, x=227)
 
         # boton, que activa la funcion MostrarInformacio
-        bottonsito2 = CTkButton(bordeInfo, text="Consultar Saldo", bg_color="#0084f1", fg_color="#4bb4f6", width=392,
+        bottonsito2 = CTkButton(bordeInfo, text="Consultar Informacion", bg_color="#0084f1", fg_color="#4bb4f6", width=392,
                                 height=45, corner_radius=8, font=("Microsoft YaHei UI Light", 15),
                                 command=lambda: self.consultarSaldo(controller, respuestaLabelFrame))
         bottonsito2.place(x=240, y=52)
         # el resto de botones, que no hacen nada por el momento
-        bottonsito3 = CTkButton(bordeInfo, text="Realizar deposito", bg_color="#0084f1", fg_color="#4bb4f6", width=392,
-                                height=45, corner_radius=8, font=("Microsoft YaHei UI Light", 15))
+        bottonsito3 = CTkButton(bordeInfo, text="Realizar deposito", bg_color="#0084f1", fg_color="#4bb4f6", width=392, command=lambda: self.RealizarDeposito(controller, respuestaLabelFrame), height=45, corner_radius=8, font=("Microsoft YaHei UI Light", 15))
         bottonsito3.place(x=240, y=102)
 
         bottonsito4 = CTkButton(bordeInfo, text="Realizar Retiro", bg_color="#0084f1", fg_color="#4bb4f6", width=392,
-                                height=45, corner_radius=8, font=("Microsoft YaHei UI Light", 15), command=lambda: controller.show_frame(RealizarRetiro))
+                                height=45, corner_radius=8, font=("Microsoft YaHei UI Light", 15), command=lambda: self.RealizarRetiro(controller, respuestaLabelFrame))
         bottonsito4.place(x=240, y=152)
 
         bottonsito5 = CTkButton(bordeInfo, text="Transferencia entre cuentas", bg_color="#0084f1", fg_color="#4bb4f6",
                                 width=392,
-                                height=45, corner_radius=8, font=("Microsoft YaHei UI Light", 15), command=lambda: controller.show_frame(TransferenciaDinero))
+                                height=45, corner_radius=8, font=("Microsoft YaHei UI Light", 15), command=lambda: self.TransferenciaEntreCuentas(controller, respuestaLabelFrame))
         bottonsito5.place(x=240, y=202)
         # boton para volver, ojo, tiene SalirPagina()
         Buttona = tk.Button(self, text="Volver", font=("Arial", 15),
@@ -277,7 +277,16 @@ class InfoUsuario(tk.Frame):
         eliminar_widgets_labelframe(frame)
         # limpiamos lo que este dentro de nuestro labelframe, antes de generar nuevos widgets
 
-        self.controller = controller
+        self.La1 = CTkLabel(frame, text="Foto De\n Perfil", text_color="#010f4c", fg_color="#0026a3", corner_radius=16, font=("Microsoft YaHei UI Light", 32, "bold"))
+        self.La1.place(x=45, y=115)
+
+        self.L1 = CTkLabel(frame, text="", width=168, height=168, fg_color="#0026a3", corner_radius=16)
+        self.L1.place(x=210, y=80)
+        path = 'fotosPerfil/'+str(controller.foto)+'.jpeg'
+        self.img_perfil = os.path.join(os.path.dirname(__file__), path)
+        self.image = customtkinter.CTkImage(light_image=Image.open(self.img_perfil), size=(147, 147))
+        self.image_label = customtkinter.CTkLabel(frame, bg_color="#01213a", image=self.image, text='')
+        self.image_label.place(x=220, y=90)
 
         self.Lab1 = CTkLabel(frame, text="", width=380, height=60, fg_color="#0026a3", corner_radius=16)
         self.Lab1.place(x=10, y=7)
@@ -306,6 +315,360 @@ class InfoUsuario(tk.Frame):
         self.Label6 = tk.Label(frame, fg="white", bg="#0084f1", text="FisiCoins: " + str(controller.FisiCoins),
                                font=("Microsoft YaHei UI Light", 12))
         self.Label6.place(x=5, y=500)
+
+    def RealizarDeposito(self, controller, frame):
+        eliminar_widgets_labelframe(frame)
+
+        self.controller = controller
+
+        titulo = CTkLabel(frame, text="Realizar Deposito", font=("Microsoft YaHei UI Light", 25), bg_color='#0084f1',
+                          fg_color='#0026a3', corner_radius=16, width=310, height=48, text_color="white")
+        titulo.place(x=45, y=35)
+
+        self.monto_entry = CTkEntry(frame, placeholder_text="Monto a depositar",
+                                    font=("Microsoft YaHei UI Light", 15), width=300, height=41, text_color="gray90",
+                                    bg_color="#0084f1", fg_color="gray26")
+        self.monto_entry.place(x=45, y= 170)
+
+        boton_confirmar = CTkButton(frame, text="Confirmar Deposito", bg_color="#0084f1", fg_color="SpringGreen2",
+                                    width=300, height=45, font=("Arial", 20), command=self.realizar_deposito)
+        boton_confirmar.place(x=45, y=400)
+
+        boton_descargar = CTkButton(frame, text="Descargar PDF", bg_color="#0084f1", fg_color="SpringGreen2",
+                                    width=300, height=45, font=("Arial", 20), command=self.descargar_pdfDeposito)
+        boton_descargar.place(x=45, y=470)
+
+    def realizar_deposito(self):
+        try:
+            monto = float(self.monto_entry.get())
+            if monto <= 0:
+                raise ValueError("El monto debe ser positivo")
+
+            if monto > self.controller.FisiCoins:
+                messagebox.showerror("Error", "Fondos insuficientes")
+            else:
+                self.controller.modificarFisiCoinsMas(monto)
+                self.generar_factura_pdfDeposito(monto)
+                self.pdf_generado = True
+                messagebox.showinfo("Éxito", f"Has depositado {monto} FisiCoins")
+
+        except ValueError as ve:
+            messagebox.showerror("Error", f"Entrada inválida: {ve}")
+
+        self.monto_entry.delete(0, tk.END)
+
+    def RealizarRetiro(self, controller, frame):
+        eliminar_widgets_labelframe(frame)
+
+        self.controller = controller
+
+        titulo = CTkLabel(frame, text="Realizar Retiro", font=("Microsoft YaHei UI Light", 25), bg_color='#0084f1',
+                          fg_color='#0026a3', corner_radius=16, width=310, height=48, text_color="white")
+        titulo.place(x=45, y=35)
+
+        self.monto_entry = CTkEntry(frame, placeholder_text="Monto a Retirar",
+                                    font=("Microsoft YaHei UI Light", 15), width=300, height=41, text_color="gray90",
+                                    bg_color="#0084f1", fg_color="gray26")
+        self.monto_entry.place(x=45, y=170)
+
+        boton_confirmar = CTkButton(frame, text="Confirmar Retiro", bg_color="#0084f1", fg_color="SpringGreen2",
+                                    width=300, height=45, font=("Arial", 20), command=self.realizar_retiro)
+        boton_confirmar.place(x=45, y=400)
+
+        boton_descargar = CTkButton(frame, text="Descargar PDF", bg_color="#0084f1", fg_color="SpringGreen2",
+                                    width=300, height=45, font=("Arial", 20), command=self.descargar_pdfRetiro)
+        boton_descargar.place(x=45, y=470)
+
+    def realizar_retiro(self):
+        try:
+            monto = float(self.monto_entry.get())
+            if monto <= 0:
+                raise ValueError("El monto debe ser positivo")
+
+            if monto > self.controller.FisiCoins:
+                messagebox.showerror("Error", "Fondos insuficientes")
+            else:
+                self.controller.modificarFisiCoins(monto)
+                self.generar_factura_pdfRetiro(monto)
+                self.pdf_generado = True
+                messagebox.showinfo("Éxito", f"Has retirado {monto} FisiCoins")
+
+        except ValueError as ve:
+            messagebox.showerror("Error", f"Entrada inválida: {ve}")
+
+        self.monto_entry.delete(0, tk.END)
+    def generar_factura_pdfDeposito(self, monto):
+        try:
+            pdf_path = "factura_deposito.pdf"
+            doc = SimpleDocTemplate(pdf_path, pagesize=letter)
+            elements = []
+
+            # Estilos
+            styles = getSampleStyleSheet()
+            title_style = styles['Heading1']
+            normal_style = styles['Normal']
+
+            # Título del documento
+            elements.append(Paragraph("Factura de Deposito de Dinero", title_style))
+
+            # Información del remitente
+            elements.append(Paragraph(f"Remitente: {self.controller.nombreEstudiante}", normal_style))
+            elements.append(Paragraph(f"Correo Remitente: {self.controller.correoEstudiante}", normal_style))
+            elements.append(Paragraph(f"Código de Estudiante: {self.controller.codigoEstudiante}", normal_style))
+
+            # Espacio
+            elements.append(Paragraph(" ", normal_style))
+
+            # Información de la transacción
+            elements.append(Paragraph(f"Fecha: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", normal_style))
+            elements.append(Paragraph(f"Monto Depositado: {monto} FisiCoins", normal_style))
+
+            # Tabla de detalles
+            data = [
+                ["Descripción", "Cantidad"],
+                ["Deposito de FisiCoins", f"{monto}"]
+            ]
+            table = Table(data)
+            table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                ('GRID', (0, 0), (-1, -1), 1, colors.black),
+            ]))
+            elements.append(table)
+
+            # Pie de página
+            elements.append(Paragraph("Gracias por usar nuestros servicios.", normal_style))
+
+            # Construir el PDF
+            doc.build(elements)
+        except Exception as e:
+            messagebox.showerror("Error", f"Error al generar el PDF: {e}")
+            self.pdf_generado = False
+
+    def generar_factura_pdfRetiro(self, monto):
+        try:
+            pdf_path = "factura_retiro.pdf"
+            doc = SimpleDocTemplate(pdf_path, pagesize=letter)
+            elements = []
+
+            # Estilos
+            styles = getSampleStyleSheet()
+            title_style = styles['Heading1']
+            normal_style = styles['Normal']
+
+            # Título del documento
+            elements.append(Paragraph("Factura de Retiro de Dinero", title_style))
+
+            # Información del remitente
+            elements.append(Paragraph(f"Remitente: {self.controller.nombreEstudiante}", normal_style))
+            elements.append(Paragraph(f"Correo Remitente: {self.controller.correoEstudiante}", normal_style))
+            elements.append(Paragraph(f"Código de Estudiante: {self.controller.codigoEstudiante}", normal_style))
+
+            # Espacio
+            elements.append(Paragraph(" ", normal_style))
+
+            # Información de la transacción
+            elements.append(Paragraph(f"Fecha: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", normal_style))
+            elements.append(Paragraph(f"Monto Retirado: {monto} FisiCoins", normal_style))
+
+            # Tabla de detalles
+            data = [
+                ["Descripción", "Cantidad"],
+                ["Deposito de FisiCoins", f"{monto}"]
+            ]
+            table = Table(data)
+            table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                ('GRID', (0, 0), (-1, -1), 1, colors.black),
+            ]))
+            elements.append(table)
+
+            # Pie de página
+            elements.append(Paragraph("Gracias por usar nuestros servicios.", normal_style))
+
+            # Construir el PDF
+            doc.build(elements)
+        except Exception as e:
+            messagebox.showerror("Error", f"Error al generar el PDF: {e}")
+            self.pdf_generado = False
+
+    def eliminar_pdfDeposito(self):
+        pdf_path = "factura_deposito.pdf"
+        if os.path.exists(pdf_path):
+            os.remove(pdf_path)
+
+    def eliminar_pdfRetiro(self):
+        pdf_path = "factura_retiro.pdf"
+        if os.path.exists(pdf_path):
+            os.remove(pdf_path)
+
+    def descargar_pdfRetiro(self):
+        if not self.pdf_generado:
+            messagebox.showerror("Error", "No se ha realizado ningún retiro.")
+            return
+
+        pdf_path = "factura_retiro.pdf"
+        if os.path.exists(pdf_path):
+            os.startfile(pdf_path)
+        else:
+            messagebox.showerror("Error", "El archivo PDF no existe.")
+
+    def descargar_pdfDeposito(self):
+        if not self.pdf_generado:
+            messagebox.showerror("Error", "No se ha realizado ningún retiro.")
+            return
+
+        pdf_path = "factura_deposito.pdf"
+        if os.path.exists(pdf_path):
+            os.startfile(pdf_path)
+        else:
+            messagebox.showerror("Error", "El archivo PDF no existe.")
+    def TransferenciaEntreCuentas(self, controller, frame):
+        eliminar_widgets_labelframe(frame)
+        self.controller = controller
+
+        self.label_transferencia = CTkLabel(frame, text="Transferencia de Dinero", font=("Microsoft YaHei UI Light", 20),
+                                       text_color="white", fg_color= "#0026a3", bg_color="#0084f1", width=310, height=48, corner_radius=16)
+        self.label_transferencia.place(x=45, y=35)
+
+        self.label_destino = CTkLabel(frame, text="Correo de destino:",
+                                      font=("Microsoft YaHei UI Light", 15), text_color="white")
+        self.label_destino.place(x=45, y=150)
+        self.entry_destino = CTkEntry(frame, width=300)
+        self.entry_destino.place(x=45, y=180)
+
+        self.label_monto = CTkLabel(frame, text="Monto a transferir:",
+                                    font=("Microsoft YaHei UI Light", 15), text_color="white")
+        self.label_monto.place(x=45, y=280)
+        self.entry_monto = CTkEntry(frame, width=300)
+        self.entry_monto.place(x=45, y=310)
+
+        boton_transferir = CTkButton(frame, text="Transferir", bg_color="#0084f1", fg_color="SpringGreen2",
+                                     text_color="gray90", width=300, height=45, corner_radius=8,
+                                     font=("Microsoft YaHei UI Light", 20), command=self.realizar_transferencia)
+        boton_transferir.place(x=45, y=400)
+
+        boton_descargar = CTkButton(frame, text="Descargar PDF", bg_color="#0084f1",
+                                    fg_color="SpringGreen2", text_color="gray90", width=300, height=45, corner_radius=8,
+                                    font=("Microsoft YaHei UI Light", 20), command=self.descargar_pdfTransferencia)
+        boton_descargar.place(x=45, y=470)
+
+    def realizar_transferencia(self):
+        correo_destino = self.entry_destino.get()
+        monto = self.entry_monto.get()
+
+        if not correo_destino or not monto:
+            messagebox.showerror("Error", "Por favor, complete todos los campos.")
+            return
+
+        try:
+            monto = float(monto)
+        except ValueError:
+            messagebox.showerror("Error", "Por favor, ingrese un monto válido.")
+            return
+
+        if monto <= 0:
+            messagebox.showerror("Error", "El monto debe ser mayor a cero.")
+            return
+
+        if monto > self.controller.FisiCoins:
+            messagebox.showerror("Error", "Saldo insuficiente.")
+            return
+
+        if not self.es_correo_valido(correo_destino):
+            messagebox.showerror("Error", "Por favor, ingrese un correo válido.")
+            return
+        if correo_destino == self.controller.correoEstudiante:
+            messagebox.showerror("Error", "No se puede transferir a la misma cuenta.")
+            return
+        try:
+            df = pd.read_excel("loginData.xlsx")
+            if correo_destino not in df["Correo"].values:
+                messagebox.showerror("Error", "El correo de destino no existe en la base de datos.")
+                return
+        except FileNotFoundError:
+            messagebox.showerror("Error", "El archivo no se encuentra.")
+            return
+
+        # Aquí se debe realizar la lógica para transferir el dinero
+        self.controller.modificarFisiCoins(monto)
+        self.generar_factura_pdfTransferencia(correo_destino, monto)
+        self.controller.MandarDinero(monto, correo_destino)
+        messagebox.showinfo("Éxito", f"Transferencia de {monto} FisiCoins a {correo_destino} realizada con éxito.")
+
+    def es_correo_valido(self, correo):
+        import re
+        return re.match(r"[^@]+@[^@]+\.[^@]+", correo) is not None
+
+    def descargar_pdfTransferencia(self):
+        pdf_path = "factura_transaccion.pdf"
+        if os.path.exists(pdf_path):
+            os.startfile(pdf_path)
+        else:
+            messagebox.showerror("Error", "El archivo PDF no existe.")
+
+    def generar_factura_pdfTransferencia(self, correo_destino, monto):
+        pdf_path = "factura_transaccion.pdf"
+        doc = SimpleDocTemplate(pdf_path, pagesize=letter)
+        elements = []
+
+        # Estilos
+        styles = getSampleStyleSheet()
+        title_style = styles['Heading1']
+        normal_style = styles['Normal']
+
+        # Título del documento
+        elements.append(Paragraph("Factura de Transferencia de Dinero", title_style))
+
+        # Información del remitente
+        elements.append(Paragraph(f"Remitente: {self.controller.nombreEstudiante}", normal_style))
+        elements.append(Paragraph(f"Correo Remitente: {self.controller.correoEstudiante}", normal_style))
+        elements.append(Paragraph(f"Código de Estudiante: {self.controller.codigoEstudiante}", normal_style))
+
+        # Espacio
+        elements.append(Paragraph(" ", normal_style))
+
+        # Información de la transacción
+        elements.append(Paragraph(f"Fecha: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", normal_style))
+        elements.append(Paragraph(f"Correo Destinatario: {correo_destino}", normal_style))
+        elements.append(Paragraph(f"Monto Transferido: {monto} FisiCoins", normal_style))
+
+        # Tabla de detalles
+        data = [
+            ["Descripción", "Cantidad"],
+            ["Transferencia de FisiCoins", f"{monto}"]
+        ]
+        table = Table(data)
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ]))
+        elements.append(table)
+
+        # Pie de página
+        elements.append(Paragraph("Gracias por usar nuestros servicios.", normal_style))
+
+        # Construir el PDF
+        doc.build(elements)
+
+    def eliminar_pdfTransferencia(self):
+        pdf_path = "factura_transaccion.pdf"
+        if os.path.exists(pdf_path):
+            os.remove(pdf_path)
 
     # al salir de la pagina, debemos eliminar los Label que creamos en MostrarInformacion
     def salirPagina(self, frame):
@@ -340,7 +703,7 @@ class Prestamos_Inversiones(tk.Frame):
 
         buttonxd1 = CTkButton(bordePrest_inv, text="Inversiones", fg_color="#114b5f", hover_color="darkcyan",
                               font=("Nunito", 35), width=392,
-                              height=45, corner_radius=8)
+                              height=45, corner_radius=8, command=lambda: controller.show_frame(Inversiones))
         buttonxd1.place(x=710, y=275)
 
         Buttonb = tk.Button(self, text="Volver", font=("Arial", 15), command=lambda: self.salirPagina())
@@ -610,308 +973,144 @@ class Prestamos(tk.Frame):
         eliminar_widgets_labelframe(frame)
         self.controller.show_frame(Prestamos_Inversiones)
 
-
-class RealizarRetiro(tk.Frame):
+class Inversiones(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
-        self.pdf_generado = False
+        self.historial_inversiones = []  # Lista para almacenar el historial de inversiones
+        self.configurar_frame()
 
-        bordeRetiro = tk.LabelFrame(self, bg='gray22', bd=10, font=("Microsoft YaHei UI Light", 15))
-        bordeRetiro.pack(fill="both", expand=True)
+    def configurar_frame(self):
+        bordeInv = tk.LabelFrame(self, bg='#05171d', bd=10, font=("Microsoft YaHei UI Light", 15))
+        bordeInv.pack(fill="both", expand=True)
 
-        # Título
-        titulo = tk.Label(bordeRetiro, text="Realizar Retiro", font=("Microsoft YaHei UI Light", 25), bg='gray22',
-                          fg='white')
-        titulo.pack(pady=20)
+        # Etiqueta de selección de tipo de inversión
+        label_tipo_inversion = CTkLabel(bordeInv, text="Seleccione tipo de inversión:", fg_color="#88d398",
+                                        bg_color="#01213a", corner_radius=16, width=420, height=80,
+                                        font=("Microsoft YaHei UI Light", 15))
+        label_tipo_inversion.place(x=227, y=20)
 
-        # Campo para ingresar el monto
-        self.monto_entry = CTkEntry(bordeRetiro, placeholder_text="Monto a retirar",
-                                    font=("Microsoft YaHei UI Light", 15), width=300, height=35, text_color="gray90",
-                                    bg_color="gray22", fg_color="gray26")
-        self.monto_entry.pack(pady=10)
+        # Botones para seleccionar tipo de inversión
+        button_acciones = CTkButton(bordeInv, text="Acciones", fg_color="#114b5f", hover_color="darkcyan",
+                                    font=("Nunito", 25), width=200, height=45, corner_radius=8,
+                                    command=lambda: self.seleccionar_inversion("Acciones"))
+        button_acciones.place(x=400, y=120)
 
-        # Botón para confirmar el retiro
-        boton_confirmar = CTkButton(bordeRetiro, text="Confirmar Retiro", bg_color="gray17", fg_color="SpringGreen2",
-                                    width=300, height=45, font=("Arial", 20), command=self.realizar_retiro)
-        boton_confirmar.pack(pady=20)
+        button_bonos = CTkButton(bordeInv, text="Bonos", fg_color="#114b5f", hover_color="darkcyan",
+                                 font=("Nunito", 25), width=200, height=45, corner_radius=8,
+                                 command=lambda: self.seleccionar_inversion("Bonos"))
+        button_bonos.place(x=400, y=200)
 
-        # Botón para regresar a InfoUsuario
-        boton_volver = CTkButton(bordeRetiro, text="Volver", bg_color="gray17", fg_color="red", width=300, height=45,
-                                 font=("Arial", 20), command=lambda: controller.show_frame(InfoUsuario))
-        boton_volver.pack(pady=10)
+        button_fondos = CTkButton(bordeInv, text="Fondos Mutuos", fg_color="#114b5f", hover_color="darkcyan",
+                                  font=("Nunito", 25), width=200, height=45, corner_radius=8,
+                                  command=lambda: self.seleccionar_inversion("Fondos Mutuos"))
+        button_fondos.place(x=400, y=280)
 
-        boton_descargar = CTkButton(bordeRetiro, text="Descargar PDF", bg_color="gray22", fg_color="SpringGreen2",
-                                    width=300, height=45, font=("Arial", 20), command=self.descargar_pdf)
-        boton_descargar.pack(pady=10)
+        # Etiqueta para evaluar riesgos
+        label_evaluar_riesgos = CTkLabel(bordeInv, text="Evaluar riesgos:", fg_color="#88d398", bg_color="#01213a",
+                                         corner_radius=16, width=420, height=80,
+                                         font=("Microsoft YaHei UI Light", 15))
+        label_evaluar_riesgos.place(x=227, y=370)
 
-    def realizar_retiro(self):
-        try:
-            monto = float(self.monto_entry.get())
-            if monto <= 0:
-                raise ValueError("El monto debe ser positivo")
+        # Entrada para ingresar el monto a invertir
+        self.entrada_monto_invertir = CTkEntry(bordeInv, placeholder_text="Ingrese el monto a invertir",
+                                               font=("Microsoft YaHei UI Light", 15), width=300, height=35,
+                                               text_color="gray90", bg_color="gray22", fg_color="gray26")
+        self.entrada_monto_invertir.place(x=685, y=385)
 
-            if monto > self.controller.FisiCoins:
-                messagebox.showerror("Error", "Fondos insuficientes")
-            else:
-                self.controller.modificarFisiCoins(self.controller.FisiCoins - monto)
-                self.generar_factura_pdf(monto)
-                self.pdf_generado = True
-                messagebox.showinfo("Éxito", f"Has retirado {monto} FisiCoins")
+        # Botón para evaluar riesgos
+        button_evaluar_riesgo = CTkButton(bordeInv, text="Evaluar Riesgo", fg_color="#114b5f",
+                                          hover_color="darkcyan",
+                                          font=("Nunito", 25), width=200, height=45, corner_radius=8,
+                                          command=self.evaluar_riesgo)
+        button_evaluar_riesgo.place(x=685, y=450)
 
+        # Botón para finalizar la inversión
+        button_finalizar = CTkButton(bordeInv, text="Finalizar Inversión", fg_color="#114b5f",
+                                     hover_color="darkcyan",
+                                     font=("Nunito", 25), width=300, height=45, corner_radius=8,
+                                     command=self.finalizar_inversion)
+        button_finalizar.place(x=505, y=520)
 
-        except ValueError as ve:
-            messagebox.showerror("Error", f"Entrada inválida: {ve}")
+        # Botón para volver al menú de opciones
+        button_volver = tk.Button(self, text="Volver", font=("Arial", 15), command=lambda: self.salir_pagina())
+        button_volver.place(x=50, y=600)
 
-        # Limpiar el campo de entrada
-        self.monto_entry.delete(0, tk.END)
+        # Botón para ver historial de inversiones
+        button_historial = tk.Button(self, text="Ver Historial", font=("Arial", 15), command=self.ver_historial)
+        button_historial.place(x=150, y=600)
 
-    def realizar_retiro(self):
-        try:
-            monto = float(self.monto_entry.get())
-            if monto <= 0:
-                raise ValueError("El monto debe ser positivo")
+        # Atributos para almacenar selección y evaluación de riesgos
+        self.tipo_inversion = ""
+        self.riesgo_evaluado = ""
 
-            if monto > self.controller.FisiCoins:
-                messagebox.showerror("Error", "Fondos insuficientes")
-            else:
-                self.controller.modificarFisiCoins(self.controller.FisiCoins - monto)
-                self.generar_factura_pdf(monto)
-                self.pdf_generado = True
-                messagebox.showinfo("Éxito", f"Has retirado {monto} FisiCoins")
+    def update_frame(self):
+        # Actualiza el frame cuando se vuelve a mostrar
+        for widget in self.winfo_children():
+            widget.destroy()
+        self.configurar_frame()
 
-        except ValueError as ve:
-            messagebox.showerror("Error", f"Entrada inválida: {ve}")
+    def seleccionar_inversion(self, tipo):
+        # Almacena el tipo de inversión seleccionado y muestra un mensaje
+        self.tipo_inversion = tipo
+        messagebox.showinfo("Selección de Inversión", f"Ha seleccionado: {tipo}")
 
-        self.monto_entry.delete(0, tk.END)
+    def evaluar_riesgo(self):
+        # Simula una evaluación de riesgos
+        if self.tipo_inversion == "":
+            messagebox.showerror("Error", "Seleccione primero el tipo de inversión.")
+            return
+        self.riesgo_evaluado = "Bajo" if self.tipo_inversion == "Bonos" else "Alto"
+        messagebox.showinfo("Evaluación de Riesgo",
+                            f"El riesgo de {self.tipo_inversion} es {self.riesgo_evaluado}.")
 
-    def generar_factura_pdf(self, monto):
-        try:
-            pdf_path = "factura_retiro.pdf"
-            doc = SimpleDocTemplate(pdf_path, pagesize=letter)
-            elements = []
-
-            # Estilos
-            styles = getSampleStyleSheet()
-            title_style = styles['Heading1']
-            normal_style = styles['Normal']
-
-            # Título del documento
-            elements.append(Paragraph("Factura de Retiro de Dinero", title_style))
-
-            # Información del remitente
-            elements.append(Paragraph(f"Remitente: {self.controller.nombreEstudiante}", normal_style))
-            elements.append(Paragraph(f"Correo Remitente: {self.controller.correoEstudiante}", normal_style))
-            elements.append(Paragraph(f"Código de Estudiante: {self.controller.codigoEstudiante}", normal_style))
-
-            # Espacio
-            elements.append(Paragraph(" ", normal_style))
-
-            # Información de la transacción
-            elements.append(Paragraph(f"Fecha: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", normal_style))
-            elements.append(Paragraph(f"Monto Retirado: {monto} FisiCoins", normal_style))
-
-            # Tabla de detalles
-            data = [
-                ["Descripción", "Cantidad"],
-                ["Retiro de FisiCoins", f"{monto}"]
-            ]
-            table = Table(data)
-            table.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
-                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-                ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-                ('GRID', (0, 0), (-1, -1), 1, colors.black),
-            ]))
-            elements.append(table)
-
-            # Pie de página
-            elements.append(Paragraph("Gracias por usar nuestros servicios.", normal_style))
-
-            # Construir el PDF
-            doc.build(elements)
-        except Exception as e:
-            messagebox.showerror("Error", f"Error al generar el PDF: {e}")
-            self.pdf_generado = False
-
-    def eliminar_pdf(self):
-        pdf_path = "factura_retiro.pdf"
-        if os.path.exists(pdf_path):
-            os.remove(pdf_path)
-
-    def descargar_pdf(self):
-        if not self.pdf_generado:
-            messagebox.showerror("Error", "No se ha realizado ningún retiro.")
+    def finalizar_inversion(self):
+        # Valida el monto ingresado y finaliza la inversión
+        monto = self.entrada_monto_invertir.get()
+        if not monto.isdigit():
+            messagebox.showerror("Error", "Ingrese un monto válido.")
             return
 
-        pdf_path = "factura_retiro.pdf"
-        if os.path.exists(pdf_path):
-            os.startfile(pdf_path)
-        else:
-            messagebox.showerror("Error", "El archivo PDF no existe.")
-
-
-class TransferenciaDinero(tk.Frame):
-    def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent)
-        self.controller = controller
-
-        borde_transferencia = tk.LabelFrame(self, bg='gray22', bd=10, font=("Microsoft YaHei UI Light", 15))
-        borde_transferencia.pack(fill="both", expand=True)
-
-        label_bg = CTkLabel(borde_transferencia, fg_color="blue", bg_color="gray22", text="", corner_radius=16,
-                            width=444, height=590)
-        label_bg.place(y=30, x=687)
-        label_bg1 = CTkLabel(borde_transferencia, fg_color="gray60", bg_color="blue", text="", corner_radius=16,
-                             width=420, height=570)
-        label_bg1.place(y=40, x=699)
-
-        self.label_transferencia = CTkLabel(borde_transferencia, text="Transferencia de Dinero",
-                                            font=("Microsoft YaHei UI Light", 20), text_color="white")
-        self.label_transferencia.place(x=740, y=100)
-
-        self.label_destino = CTkLabel(borde_transferencia, text="Correo de destino:",
-                                      font=("Microsoft YaHei UI Light", 15), text_color="white")
-        self.label_destino.place(x=740, y=150)
-        self.entry_destino = CTkEntry(borde_transferencia, width=300)
-        self.entry_destino.place(x=740, y=180)
-
-        self.label_monto = CTkLabel(borde_transferencia, text="Monto a transferir:",
-                                    font=("Microsoft YaHei UI Light", 15), text_color="white")
-        self.label_monto.place(x=740, y=220)
-        self.entry_monto = CTkEntry(borde_transferencia, width=300)
-        self.entry_monto.place(x=740, y=250)
-
-        boton_transferir = CTkButton(borde_transferencia, text="Transferir", bg_color="gray22", fg_color="SpringGreen2",
-                                     text_color="gray90", width=300, height=45, corner_radius=8,
-                                     font=("Microsoft YaHei UI Light", 20), command=self.realizar_transferencia)
-        boton_transferir.place(x=740, y=300)
-
-        boton_volver = CTkButton(borde_transferencia, text="Volver", bg_color="gray22", fg_color="red",
-                                 text_color="gray90", width=300, height=45, corner_radius=8,
-                                 font=("Microsoft YaHei UI Light", 20),
-                                 command=lambda: controller.show_frame(InfoUsuario))
-        boton_volver.place(x=740, y=360)
-        boton_descargar = CTkButton(borde_transferencia, text="Descargar PDF", bg_color="gray22",
-                                    fg_color="SpringGreen2", text_color="gray90", width=300, height=45, corner_radius=8,
-                                    font=("Microsoft YaHei UI Light", 20), command=self.descargar_pdf)
-        boton_descargar.place(x=740, y=420)
-
-    def realizar_transferencia(self):
-        correo_destino = self.entry_destino.get()
-        monto = self.entry_monto.get()
-
-        if not correo_destino or not monto:
-            messagebox.showerror("Error", "Por favor, complete todos los campos.")
-            return
-
-        try:
-            monto = float(monto)
-        except ValueError:
-            messagebox.showerror("Error", "Por favor, ingrese un monto válido.")
-            return
-
+        monto = float(monto)
         if monto <= 0:
-            messagebox.showerror("Error", "El monto debe ser mayor a cero.")
+            messagebox.showerror("Error", "Ingrese un monto mayor que cero.")
             return
 
-        if monto > self.controller.FisiCoins:
-            messagebox.showerror("Error", "Saldo insuficiente.")
+        if self.tipo_inversion == "":
+            messagebox.showerror("Error", "Seleccione primero el tipo de inversión.")
             return
 
-        if not self.es_correo_valido(correo_destino):
-            messagebox.showerror("Error", "Por favor, ingrese un correo válido.")
-            return
-        if correo_destino == self.controller.correoEstudiante:
-            messagebox.showerror("Error", "No se puede transferir a la misma cuenta.")
-            return
-        try:
-            df = pd.read_excel("loginData.xlsx")
-            if correo_destino not in df["Correo"].values:
-                messagebox.showerror("Error", "El correo de destino no existe en la base de datos.")
-                return
-        except FileNotFoundError:
-            messagebox.showerror("Error", "El archivo no se encuentra.")
+        if self.riesgo_evaluado == "":
+            messagebox.showerror("Error", "Evalúe el riesgo antes de finalizar la inversión.")
             return
 
-        # Aquí se debe realizar la lógica para transferir el dinero
-        self.controller.FisiCoins -= monto
-        # Añade el monto a la cuenta de destino (esto debería hacerse en una base de datos real)
-        messagebox.showinfo("Éxito", f"Transferencia de {monto} FisiCoins a {correo_destino} realizada con éxito.")
-        c = canvas.Canvas("transaccion.pdf", pagesize=letter)
-        c.drawString(100, 750, f"Transferencia de {monto} FisiCoins realizada con éxito.")
-        c.drawString(100, 730, f"Destinatario: {correo_destino}")
-        c.save()
-        self.generar_factura_pdf(correo_destino, monto)
+        # Guarda la inversión en el historial
+        self.historial_inversiones.append((self.tipo_inversion, monto, self.riesgo_evaluado))
 
-    def es_correo_valido(self, correo):
-        import re
-        return re.match(r"[^@]+@[^@]+\.[^@]+", correo) is not None
+        # Aquí podrías implementar la lógica para finalizar la inversión
+        messagebox.showinfo("Inversión Finalizada",
+                            f"Ha invertido {monto} en {self.tipo_inversion} con riesgo {self.riesgo_evaluado}.")
 
-    def descargar_pdf(self):
-        pdf_path = "factura_transaccion.pdf"
-        if os.path.exists(pdf_path):
-            os.startfile(pdf_path)
+        # Reiniciar variables para futuras inversiones
+        self.tipo_inversion = ""
+        self.riesgo_evaluado = ""
+        self.entrada_monto_invertir.delete(0, tk.END)
+
+    def salir_pagina(self):
+        # Muestra el frame de Prestamos_Inversiones
+        self.controller.show_frame(Prestamos_Inversiones)
+
+    def ver_historial(self):
+        # Muestra el historial de inversiones
+        if not self.historial_inversiones:
+            messagebox.showinfo("Historial de Inversiones", "No hay inversiones registradas.")
         else:
-            messagebox.showerror("Error", "El archivo PDF no existe.")
-
-    def generar_factura_pdf(self, correo_destino, monto):
-        pdf_path = "factura_transaccion.pdf"
-        doc = SimpleDocTemplate(pdf_path, pagesize=letter)
-        elements = []
-
-        # Estilos
-        styles = getSampleStyleSheet()
-        title_style = styles['Heading1']
-        normal_style = styles['Normal']
-
-        # Título del documento
-        elements.append(Paragraph("Factura de Transferencia de Dinero", title_style))
-
-        # Información del remitente
-        elements.append(Paragraph(f"Remitente: {self.controller.nombreEstudiante}", normal_style))
-        elements.append(Paragraph(f"Correo Remitente: {self.controller.correoEstudiante}", normal_style))
-        elements.append(Paragraph(f"Código de Estudiante: {self.controller.codigoEstudiante}", normal_style))
-
-        # Espacio
-        elements.append(Paragraph(" ", normal_style))
-
-        # Información de la transacción
-        elements.append(Paragraph(f"Fecha: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", normal_style))
-        elements.append(Paragraph(f"Correo Destinatario: {correo_destino}", normal_style))
-        elements.append(Paragraph(f"Monto Transferido: {monto} FisiCoins", normal_style))
-
-        # Tabla de detalles
-        data = [
-            ["Descripción", "Cantidad"],
-            ["Transferencia de FisiCoins", f"{monto}"]
-        ]
-        table = Table(data)
-        table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
-            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-            ('GRID', (0, 0), (-1, -1), 1, colors.black),
-        ]))
-        elements.append(table)
-
-        # Pie de página
-        elements.append(Paragraph("Gracias por usar nuestros servicios.", normal_style))
-
-        # Construir el PDF
-        doc.build(elements)
-
-    def eliminar_pdf(self):
-        pdf_path = "factura_transaccion.pdf"
-        if os.path.exists(pdf_path):
-            os.remove(pdf_path)
-
+            historial = "\n".join(
+                [f"Tipo: {inv[0]}, Monto: {inv[1]}, Riesgo: {inv[2]}" for inv in self.historial_inversiones])
+            messagebox.showinfo("Historial de Inversiones", historial)
+def salirPagina(self, frame):
+    eliminar_widgets_labelframe(frame)
+    self.controller.show_frame(Prestamos_Inversiones)
 
 
 class Config(tk.Frame):
@@ -999,6 +1198,7 @@ class Config(tk.Frame):
                         self.C2.delete(0, tk.END)
                         self.C3.delete(0, tk.END)
                         eliminar_widgets_labelframe(frame)
+                        controller.show_frame(MenuOpciones)
                     else:
                         messagebox.showinfo("Error", "La confirmación de la nueva contraseña no coincide")
                 else:
@@ -1018,6 +1218,63 @@ class Config(tk.Frame):
         self.controller.show_frame(MenuOpciones)
 
 
+class pagarServicios(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller
+        self.service_prices = {}
+        bordeMenu = tk.LabelFrame(self, bg='#05171d', bd=10, font=("Microsoft YaHei UI Light", 15))
+        bordeMenu.pack(fill="both", expand=True)
+        # PAGAR SERVICIOS
+        self.title = tk.Label(bordeMenu, text="Pagar Servicios", font=("Helvetica", 30), bg="#05171d", fg="white")
+        self.title.place(x=530, y=80)
+
+        # elegirr
+        self.service_label = tk.Label(bordeMenu, text="Seleccione el servicio a pagar:",
+                                      font=("Microsoft YaHei UI Light", 16), bg="#05171d", fg="white")
+        self.service_label.place(x=300, y=150)
+
+        self.service_var = tk.StringVar(value="Electricidad")
+        self.service_options = ["Electricidad", "Agua", "Internet", "Teléfono", "Gas"]
+        for service in self.service_options:
+            self.service_prices[service] = random.randint(20, 100)
+        self.service_menu = tk.OptionMenu(bordeMenu, self.service_var, *self.service_options,
+                                          command=self.update_amount_label)
+        self.service_menu.place(x=300, y=200, width=200, height=30)
+
+        # monto a pagar
+        self.amount_label = tk.Label(bordeMenu,
+                                     text=f"Monto a pagar: {self.service_prices[self.service_var.get()]} fisiCoins",
+                                     font=("Microsoft YaHei UI Light", 16), bg="#05171d", fg="white")
+        self.amount_label.place(x=300, y=250)
+        # saldo actualizado
+        self.bolsillo = tk.Label(bordeMenu, fg="white", bg="#0084f1", text="FisiCoins: " + str(controller.FisiCoins),
+                                 font=("Microsoft YaHei UI Light", 12))
+        self.bolsillo.place(x=300, y=300)
+
+        # Botón de pagar
+        self.pay_button = tk.Button(bordeMenu, text="Pagar", command=self.pay_service)
+        self.pay_button.place(x=300, y=350)
+        Buttona = tk.Button(bordeMenu, text="Volver", font=("Arial", 15),
+                            command=lambda: controller.show_frame(MenuOpciones))
+        Buttona.place(x=50, y=600)
+
+    def pay_service(self):
+        service = self.service_var.get()
+        amount = self.service_prices[self.service_var.get()]
+
+        amount = float(amount)
+        if amount > self.controller.FisiCoins:
+            messagebox.showerror("Error", "Fondos insuficientes")
+            return
+
+        messagebox.showinfo("Pago realizado", f"Has pagado {amount} por el servicio de {service}.")
+        self.controller.modificarFisiCoins(amount)
+
+    def update_amount_label(self, selected_service):
+        self.amount_label.config(text=f"Monto a pagar: {self.service_prices[selected_service]} fisiCoins")
+
+
 # Clase Aplicacion, donde creamos la ventana por la que pasaran los frames
 class Aplicacion(tk.Tk):
     # variables que usaremos
@@ -1029,7 +1286,7 @@ class Aplicacion(tk.Tk):
     tipoEstudiante = ""
     contraseña = ""
     dni = 0
-
+    foto = 0
     # inicializamos la clase
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
@@ -1049,7 +1306,7 @@ class Aplicacion(tk.Tk):
         # el diccionario te permite almacenar distintos valores, no solo tipos de datos primitivos
         # como el array en c++, pero con mas capacidades
         self.frames = {}
-        for F in (Login, MenuOpciones, InfoUsuario, Config, Prestamos_Inversiones, Prestamos, RealizarRetiro, TransferenciaDinero):  # hacemos que F recorra Login, MenuOpciones, InfoUsuario (hara 3 vueltas xd)
+        for F in (Login, MenuOpciones, InfoUsuario, Config, Prestamos_Inversiones, Prestamos, pagarServicios, Inversiones):  # hacemos que F recorra Login, MenuOpciones, InfoUsuario (hara 3 vueltas xd)
             frame = F(window, self)  # esta parte de aca inicializa las subclases de Aplicacion
             # de esta manera: en la primera vuelta F sera Login, lo que hara
             # frame = Login(window, self) esto creara el Login, lo mismo pasara en la 2da y 3ra vuelta
@@ -1064,18 +1321,37 @@ class Aplicacion(tk.Tk):
     def show_frame(self, page):
         # al llamar la funcion le daremos el parametro "page", que sera para indicar a que frame queremos cambiar
         frame = self.frames[page]
-        if isinstance(frame, TransferenciaDinero):
-            frame.eliminar_pdf()
 
-        elif isinstance(frame, RealizarRetiro):
-            frame.eliminar_pdf()
         # .tkraise hace que el frame se levante sobre el que tenemos en pantalla
         frame.tkraise()
 
     # llamaremos a la funcion modificarFisicoins cuando lo necesitemos
     # le debemos pasar el nuevoValor como parametro para ser la nueva FisiCoins
     def modificarFisiCoins(self, nuevoValor):
-        self.FisiCoins = nuevoValor
+        df = pd.read_excel('loginData.xlsx')
+        numFila = df.index[df["Codigo"] == self.codigoEstudiante].tolist()
+        numFila = numFila[0]
+        FisicoinActual = df.at[numFila, "Dinero"]
+        df.at[numFila, "Dinero"] = FisicoinActual - nuevoValor
+        self.FisiCoins = FisicoinActual - nuevoValor
+        df.to_excel('loginData.xlsx', index=False)
+
+    def modificarFisiCoinsMas(self, nuevoValor):
+        df = pd.read_excel('loginData.xlsx')
+        numFila = df.index[df["Codigo"] == self.codigoEstudiante].tolist()
+        numFila = numFila[0]
+        FisicoinActual = df.at[numFila, "Dinero"]
+        df.at[numFila, "Dinero"] = FisicoinActual + nuevoValor
+        self.FisiCoins = FisicoinActual + nuevoValor
+        df.to_excel('loginData.xlsx', index=False)
+
+    def MandarDinero(self, monto, correo):
+        df = pd.read_excel('loginData.xlsx')
+        numFila = df.index[df["Correo"] == correo].tolist()
+        numFila = numFila[0]
+        FisicoinActual = df.at[numFila, "Dinero"]
+        df.at[numFila, "Dinero"] = FisicoinActual + monto
+        df.to_excel('loginData.xlsx', index=False)
 
 
 # if __name == '__main__' hace que solo se ejecute lo que esta dentro del if
